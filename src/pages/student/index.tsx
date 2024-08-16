@@ -5,6 +5,9 @@ import { FormEvent, useEffect, useState } from "react";
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
 import EyeIcon from '@rsuite/icons/legacy/Eye';
 import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
+import TrashIcon from '@rsuite/icons/Trash';
+import EditIcon from '@rsuite/icons/Edit';
+
 import { faker } from "@faker-js/faker";
 
 const { Column, HeaderCell, Cell } = Table;
@@ -14,6 +17,7 @@ function generateFakeUsers(count: number) {
         firstName: faker.name.firstName(),
         email: faker.internet.email(),
         password: faker.internet.password(),
+        test: faker.internet.ip()
     }));
 }
 
@@ -21,6 +25,7 @@ interface FakeDataProps {
     firstName: string;
     email: string;
     password: string;
+    test: string
 }
 
 
@@ -144,19 +149,42 @@ export default function Student() {
                         className={styles.table}
                     >
 
-                        <Column flexGrow={1}>
+                        <Column width={300}>
                             <HeaderCell>Nome</HeaderCell>
                             <Cell dataKey="firstName" />
                         </Column>
 
-                        <Column flexGrow={1}>
+                        <Column width={300}>
                             <HeaderCell>Email</HeaderCell>
                             <Cell dataKey="email" />
                         </Column>
 
-                        <Column flexGrow={1}>
+                        <Column width={300}>
                             <HeaderCell>Senha</HeaderCell>
                             <Cell dataKey="password" />
+                        </Column>
+
+                        <Column width={250}>
+                            <HeaderCell>Teste</HeaderCell>
+                            <Cell dataKey="test" />
+                        </Column>
+
+                        <Column width={250}>
+                            <HeaderCell>Teste</HeaderCell>
+                            <Cell dataKey="test" />
+                        </Column>
+
+                        <Column width={100} fixed="right">
+                            <HeaderCell>Ações</HeaderCell>
+                            <Cell>
+                                {rowData => (
+                                    <>
+                                        <Button className={styles.trashIcon} onClick={() => alert(rowData.firstName)}><TrashIcon /></Button>
+                                        <Button className={styles.iditIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
+                                    </>
+                                )}
+                            </Cell>
+
                         </Column>
 
                     </Table>
