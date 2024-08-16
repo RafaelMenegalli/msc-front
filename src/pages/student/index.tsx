@@ -1,5 +1,6 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
+import { DeleteConfirmationStudent } from "@/components/DeleteConfirmationStudent";
 import { FormEvent, useEffect, useState } from "react";
 
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
@@ -36,10 +37,15 @@ export default function Student() {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [data, setData] = useState<FakeDataProps[]>([])
+    const [modalVisible, setModalVisible] = useState<boolean>(false)
 
     const handleChange = () => {
         setVisible(!visible);
     };
+
+    const handleModalVisible = () => {
+        setModalVisible(!modalVisible)
+    }
 
     useEffect(() => {
         const fakeData = generateFakeUsers(20)
@@ -48,10 +54,6 @@ export default function Student() {
 
     async function handleRegisterStudent(formValue: Record<string, any> | null, event: React.FormEvent<HTMLFormElement> | undefined) {
         event?.preventDefault();
-
-        // console.log({name})
-        // console.log({email})
-        // console.log({password})
 
         if (!name || !email || !password) {
             toaster.push(
@@ -179,7 +181,7 @@ export default function Student() {
                             <Cell>
                                 {rowData => (
                                     <>
-                                        <Button className={styles.trashIcon} onClick={() => alert(rowData.firstName)}><TrashIcon /></Button>
+                                        <Button className={styles.trashIcon} onClick={() => handleModalVisible()}><TrashIcon /></Button>
                                         <Button className={styles.iditIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
                                     </>
                                 )}
@@ -190,6 +192,13 @@ export default function Student() {
                     </Table>
                 </div>
             </div>
+
+            {modalVisible && (
+                <DeleteConfirmationStudent
+                    open={handleModalVisible}
+                    visible={modalVisible}
+                />
+            )}
         </>
     )
 }
