@@ -23,6 +23,9 @@ export function Header() {
                 <Nav.Item as={Link} href="/dashboard">
                     Home
                 </Nav.Item>
+                <Nav.Item as={Link} href="/presences">
+                    Presença
+                </Nav.Item>
                 <Nav.Menu title="Cadastros">
                     <Nav.Item as={Link} href="/student">
                         Aluno

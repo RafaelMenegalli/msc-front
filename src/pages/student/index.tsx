@@ -1,7 +1,8 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
 import { DeleteConfirmationStudent } from "@/components/DeleteConfirmationStudent";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import Head from "next/head";
 
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
 import EyeIcon from '@rsuite/icons/legacy/Eye';
@@ -86,9 +87,14 @@ export default function Student() {
 
     return (
         <>
+            <Head>
+                <title>Cadastro - Aluno</title>
+            </Head>
             <Header />
 
             <div className={styles.container}>
+
+                <h1 className={styles.title}>Cadastro de Aluno</h1>
 
                 <div className={styles.containerForm}>
 
@@ -182,7 +188,7 @@ export default function Student() {
                                 {rowData => (
                                     <>
                                         <Button className={styles.trashIcon} onClick={() => handleModalVisible()}><TrashIcon /></Button>
-                                        <Button className={styles.iditIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
+                                        <Button className={styles.editIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
                                     </>
                                 )}
                             </Cell>

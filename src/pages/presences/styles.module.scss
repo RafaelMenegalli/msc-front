@@ -9,36 +9,30 @@
     gap: 16px;
 }
 
-.containerForm {
+.containerButton {
     width: 85%;
-    margin: 0 auto;
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-.form {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
 }
 
 .containerTable {
     margin: 0 auto;
     width: 85%;
-
-    .trashIcon {
-        background-color: transparent;
-    }
 }
 
-.editIcon {
-    background-color: transparent;
+.presenceButton {
+    width: 400px;
 }
 
 .title {
     font-size: 2rem;
+}
+
+.trashIcon {
+    background-color: transparent;
+}
+
+.editIcon {
+    background-color: transparent;
 }
