@@ -2,6 +2,7 @@ import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
 import { useState, useEffect } from "react";
 import Head from "next/head";
+import { LaunchPresenceModal } from "@/components/LaunchPresenceModal";
 
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
 import TrashIcon from '@rsuite/icons/Trash';
@@ -53,7 +54,7 @@ export default function Presences() {
                 <h1 className={styles.title}>Controle de Presença</h1>
 
                 <div className={styles.containerButton}>
-                    <Button appearance="primary" color="cyan" size="lg" className={styles.presenceButton}>Lançar Presença</Button>
+                    <Button appearance="primary" color="cyan" size="lg" className={styles.presenceButton} onClick={handleModalVisible}>Lançar Presença</Button>
                 </div>
 
                 <div className={styles.containerTable}>
@@ -99,6 +100,13 @@ export default function Presences() {
                     </Table>
                 </div>
             </div>
+
+            {modalVisible && (
+                <LaunchPresenceModal 
+                    open={handleModalVisible}
+                    visible={modalVisible}
+                />
+            )}
         </>
     )
 }
