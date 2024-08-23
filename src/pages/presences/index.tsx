@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import { LaunchPresenceModal } from "@/components/LaunchPresenceModal";
 
-import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
+import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Text } from 'rsuite';
 import TrashIcon from '@rsuite/icons/Trash';
 import EditIcon from '@rsuite/icons/Edit';
 
@@ -36,6 +36,16 @@ export default function Presences() {
         setModalVisible(!modalVisible)
     }
 
+    async function handleRegisterPresence() {
+        toaster.push(
+            <Notification type="success" header="Sucesso!">
+                Prenseça registrada com sucesso!
+            </Notification>, { placement: "bottomEnd", duration: 3500 }
+        )
+
+        setModalVisible(false)
+    }
+
     useEffect(() => {
         const fakeData = generateFakeUsers(20)
         setData(fakeData)
@@ -57,54 +67,16 @@ export default function Presences() {
                     <Button appearance="primary" color="cyan" size="lg" className={styles.presenceButton} onClick={handleModalVisible}>Lançar Presença</Button>
                 </div>
 
-                <div className={styles.containerTable}>
-                    <Table
-                        height={400}
-                        data={data}
-                        className={styles.table}
-                    >
-
-                        <Column width={300}>
-                            <HeaderCell>Aluno</HeaderCell>
-                            <Cell dataKey="student" />
-                        </Column>
-
-                        <Column width={300}>
-                            <HeaderCell>Professor</HeaderCell>
-                            <Cell dataKey="teacher" />
-                        </Column>
-
-                        <Column width={300}>
-                            <HeaderCell>Horário de Início</HeaderCell>
-                            <Cell dataKey="initialDate" />
-                        </Column>
-
-                        <Column width={250}>
-                            <HeaderCell>Horário de Fim</HeaderCell>
-                            <Cell dataKey="finalDate" />
-                        </Column>
-
-                        <Column width={100} fixed="right">
-                            <HeaderCell>Ações</HeaderCell>
-                            <Cell>
-                                {rowData => (
-                                    <>
-                                        <Button className={styles.trashIcon} onClick={() => handleModalVisible()}><TrashIcon /></Button>
-                                        <Button className={styles.editIcon} onClick={() => alert(rowData.student)}><EditIcon /></Button>
-                                    </>
-                                )}
-                            </Cell>
-
-                        </Column>
-
-                    </Table>
+                <div className={styles.containerText}>
+                    <Text>Presença para o aluno aluno: <strong className={styles.evidenceText}>Eduardo Moia</strong> foi registrada - 23/08/2024 18:30</Text>
                 </div>
             </div>
 
             {modalVisible && (
-                <LaunchPresenceModal 
+                <LaunchPresenceModal
                     open={handleModalVisible}
                     visible={modalVisible}
+                    registerPresence={handleRegisterPresence}
                 />
             )}
         </>

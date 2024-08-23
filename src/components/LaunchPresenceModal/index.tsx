@@ -6,15 +6,25 @@ const Label = (props: any) => {
     return <label style={{ width: 120, display: 'inline-block', marginTop: 10 }} {...props} />;
 };
 
+// type ResponsePresenceType = {
+//     name: string;
+//     classTime: Date;
+// }
+
 interface LaunchPresenceModalProps {
     open: () => void;
     visible: boolean;
+    registerPresence: () => void;
 }
 
-export function LaunchPresenceModal({ open, visible }: LaunchPresenceModalProps) {
+export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchPresenceModalProps) {
     return (
         <>
-            <Modal open={visible} onClose={open} size="lg">
+            <Modal
+                open={visible}
+                onClose={open}
+                size="lg"
+            >
                 <Modal.Title>Lançamento de Presença</Modal.Title>
 
                 <Modal.Body>
@@ -24,16 +34,14 @@ export function LaunchPresenceModal({ open, visible }: LaunchPresenceModalProps)
                             <DatePicker
                                 format="HH:mm"
                                 defaultValue={new Date()}
-                                // hideHours={hour => hour < 8 || hour > 18}
                                 hideMinutes={minute => minute % 15 !== 0}
-                            // hideSeconds={second => second % 30 !== 0}
                             />
                         </div>
 
                         <div className={styles.formGroup}>
                             <Label>Aluno</Label>
                             <SelectPicker
-                                data={[]}
+                                data={[{ value: 1, label: "Rafael" }]}
                                 style={{ width: 224 }}
                             />
                         </div>
@@ -41,7 +49,7 @@ export function LaunchPresenceModal({ open, visible }: LaunchPresenceModalProps)
                         <div className={styles.formGroup}>
                             <Label>Professor</Label>
                             <SelectPicker
-                                data={[]}
+                                data={[{ value: 1, label: "Rafael" }]}
                                 style={{ width: 224 }}
                             />
                         </div>
@@ -51,19 +59,17 @@ export function LaunchPresenceModal({ open, visible }: LaunchPresenceModalProps)
                             <DatePicker
                                 format="HH:mm"
                                 defaultValue={new Date()}
-                                // hideHours={hour => hour < 8 || hour > 18}
                                 hideMinutes={minute => minute % 15 !== 0}
-                            // hideSeconds={second => second % 30 !== 0}
                             />
                         </div>
                     </div>
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <Button color="green" appearance="primary" size="sm">Lançar</Button>
+                    <Button color="green" appearance="primary" size="sm" onClick={registerPresence}>Lançar</Button>
                     <Button appearance="subtle" onClick={() => open()}>Cancelar</Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal >
         </>
     )
 }
