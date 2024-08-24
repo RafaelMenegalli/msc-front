@@ -68,7 +68,7 @@ export default function Presences() {
                 </div>
 
                 <div className={styles.containerText}>
-                    <Text>Presença para o aluno aluno: <strong className={styles.evidenceText}>Eduardo Moia</strong> foi registrada - 23/08/2024 18:30</Text>
+                    <Text>Presença para o aluno: <strong className={styles.evidenceText}>Eduardo Moia</strong> foi registrada - 23/08/2024 18:30</Text>
                 </div>
             </div>
 

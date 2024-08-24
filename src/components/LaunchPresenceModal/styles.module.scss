@@ -1,12 +1,27 @@
-.formGroup{
+.formGroup {
     display: flex;
     flex-direction: column;
+    width: 65%;
 }
 
-.formContainer{
+.formContainer {
     display: flex;
-        width: 100%;
-        gap: 1rem;
-        align-items: center;
-        justify-content: center;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.containerDates {
+    display: flex;
+    gap: 1rem;
+}
+
+.datePiker {
+    width: 100%;
+}
+
+.sendButton {
+    width: 65%;
 }
