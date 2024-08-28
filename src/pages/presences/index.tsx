@@ -57,12 +57,9 @@ export default function Presences() {
                 <title>Controle de Aulas</title>
             </Head>
 
-            <Header />
+            <Header title="Controle de Presença" />
 
             <div className={styles.container}>
-
-                <h1 className={styles.title}>Controle de Presença</h1>
-
                 <div className={styles.containerButton}>
                     <Button appearance="primary" color="cyan" size="lg" className={styles.presenceButton} onClick={handleModalVisible}>Lançar Presença</Button>
                 </div>

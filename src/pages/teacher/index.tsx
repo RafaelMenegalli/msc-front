@@ -88,14 +88,10 @@ export default function Teacher() {
                 <title>Cadastro - Professor</title>
             </Head>
 
-            <Header />
+            <Header title="Cadastro de Professor" />
 
             <div className={styles.container}>
-
-                <h1 className={styles.title}>Cadastro de Professor</h1>
-
                 <div className={styles.containerForm}>
-
                     <Form className={styles.form} onSubmit={handleRegisterTeacher}>
 
                         <Form.Group controlId="name">

@@ -4,7 +4,11 @@ import Link from "next/link";
 import { Navbar, Nav } from "rsuite";
 import CogIcon from '@rsuite/icons/legacy/Cog';
 
-export function Header() {
+interface HeaderProps {
+    title: string;
+}
+
+export function Header({ title }: HeaderProps) {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -14,30 +18,34 @@ export function Header() {
     if (!mounted) return null;
 
     return (
-        <Navbar>
-            <Navbar.Brand as={Link} href="/dashboard">
-                MSC-Front
-            </Navbar.Brand>
-
+        <Navbar className={styles.navBar}>
             <Nav>
-                <Nav.Item as={Link} href="/dashboard">
-                    Home
-                </Nav.Item>
-                <Nav.Item as={Link} href="/presences">
-                    Presença
-                </Nav.Item>
-                <Nav.Menu title="Cadastros">
-                    <Nav.Item as={Link} href="/student">
-                        Aluno
-                    </Nav.Item>
+                <Navbar.Brand as={Link} href="/dashboard">
+                    MSC-Front
+                </Navbar.Brand>
 
-                    <Nav.Item as={Link} href="/teacher">
-                        Professor
+                <Nav>
+                    <Nav.Item as={Link} href="/dashboard">
+                        Home
                     </Nav.Item>
-                </Nav.Menu>
+                    <Nav.Item as={Link} href="/presences">
+                        Presença
+                    </Nav.Item>
+                    <Nav.Menu title="Cadastros">
+                        <Nav.Item as={Link} href="/student">
+                            Aluno
+                        </Nav.Item>
+
+                        <Nav.Item as={Link} href="/teacher">
+                            Professor
+                        </Nav.Item>
+                    </Nav.Menu>
+                </Nav>
             </Nav>
 
-            <Nav pullRight>
+            <span className={styles.title}>{title}</span>
+
+            <Nav>
                 <Nav.Item icon={<CogIcon />}>Configurações</Nav.Item>
             </Nav>
         </Navbar>
