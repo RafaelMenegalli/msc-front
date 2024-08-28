@@ -6,8 +6,6 @@ import Head from "next/head";
 import { formatCPF } from "./utils/formatCPF";
 
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Divider, Placeholder } from 'rsuite';
-import EyeIcon from '@rsuite/icons/legacy/Eye';
-import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
 import TrashIcon from '@rsuite/icons/Trash';
 import EditIcon from '@rsuite/icons/Edit';
 
@@ -30,17 +28,13 @@ interface Props {
 }
 
 export default function Student({ students }: Props) {
-    const [visibleEye, setVisibleEye] = useState(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false)
 
     const [name, setName] = useState<string>("")
     const [cpf, setCpf] = useState<string>("")
     const [email, setEmail] = useState<string>("")
+    const [tableData, setTableData] = useState<student[]>(students ? students : [])
     // const [password, setPassword] = useState<string>("")
-
-    const handleChangeEyeInput = () => {
-        setVisibleEye(!visibleEye);
-    };
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
@@ -59,12 +53,14 @@ export default function Student({ students }: Props) {
             return
         }
 
+        const createStudentPassword = `${name}!`
+
         try {
             await api.post("/students", {
                 name: name,
                 email: email,
                 cpf: cpf,
-                password: ""
+                password: createStudentPassword
             })
 
             toaster.push(
@@ -76,7 +72,6 @@ export default function Student({ students }: Props) {
             setName("")
             setEmail("")
             setCpf("")
-            // setPassword("")
         } catch (error) {
             toaster.push(
                 <Notification type="error" header="Erro!">
@@ -85,6 +80,19 @@ export default function Student({ students }: Props) {
             )
 
             console.log("Erro ao cadastrar usuário :::>> ", error)
+        }
+
+        try {
+            const response = await api.get("/students")
+            setTableData(response.data)
+        } catch (error) {
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao buscar alunos!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            )
+
+            console.log("Erro ao buscar usuário :::>> ", error)
         }
 
     }
@@ -129,60 +137,6 @@ export default function Student({ students }: Props) {
                                     onChange={e => setEmail(e)}
                                 />
                             </div>
-
-                            <div style={{ gridColumn: 'span 3' }}>
-                                <Label>Temp</Label>
-                                <Input
-                                    type="nunber"
-                                    value={email}
-                                    onChange={e => setEmail(e)}
-                                />
-                            </div>
-
-                            <div style={{ gridColumn: 'span 3' }}>
-                                <Label>Temp</Label>
-                                <Input
-                                    type="nunber"
-                                    value={email}
-                                    onChange={e => setEmail(e)}
-                                />
-                            </div>
-
-                            <div style={{ gridColumn: 'span 3' }}>
-                                <Label>Temp</Label>
-                                <Input
-                                    type="nunber"
-                                    value={email}
-                                    onChange={e => setEmail(e)}
-                                />
-                            </div>
-
-                            <div style={{ gridColumn: 'span 3' }}>
-                                <Label>Temp</Label>
-                                <Input
-                                    type="nunber"
-                                    value={email}
-                                    onChange={e => setEmail(e)}
-                                />
-                            </div>
-
-                            {/* <Form.Group controlId="password">
-                            <Form.ControlLabel>Senha</Form.ControlLabel>
-
-                            <InputGroup inside className={styles.inputGroup}>
-                                <Input
-                                    type={visibleEye ? 'text' : 'password'}
-                                    name="password"
-                                    value={password}
-                                    onChange={e => setPassword(e)}
-                                />
-                                <InputGroup.Button onClick={handleChangeEyeInput}>
-                                    {visibleEye ? <EyeIcon /> : <EyeSlashIcon />}
-                                </InputGroup.Button>
-                            </InputGroup>
-
-                        </Form.Group> */}
-
                         </div>
 
                         <div className={styles.containerButton}>
@@ -200,7 +154,7 @@ export default function Student({ students }: Props) {
                 <div className={styles.containerTable}>
                     <Table
                         autoHeight
-                        data={students}
+                        data={tableData}
                         className={styles.table}
                     >
 
@@ -252,4 +206,4 @@ export const getServerSideProps = (async () => {
             students: students.data
         }
     }
-})
+})  

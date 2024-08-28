@@ -1,57 +1,45 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
 import { DeleteConfirmationTeacher } from "@/components/DeleteConfirmationTeacher";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Head from "next/head";
 
-import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table } from 'rsuite';
+import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Divider } from 'rsuite';
 import EyeIcon from '@rsuite/icons/legacy/Eye';
 import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
 import TrashIcon from '@rsuite/icons/Trash';
 import EditIcon from '@rsuite/icons/Edit';
 
-import { faker } from "@faker-js/faker";
+import { GetServerSideProps } from "next";
+import { api } from "@/services/apiClient";
 
 const { Column, HeaderCell, Cell } = Table;
+const Label = (props: any) => {
+    return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
+};
 
-function generateFakeUsers(count: number) {
-    return Array.from({ length: count }, () => ({
-        firstName: faker.name.firstName(),
-        email: faker.internet.email(),
-        password: faker.internet.password(),
-        test: faker.internet.ip()
-    }));
-}
-
-interface FakeDataProps {
-    firstName: string;
+type teacher = {
+    id: string;
+    name: string;
     email: string;
-    password: string;
-    test: string
 }
 
+interface Props {
+    teachers: teacher[]
+}
 
-export default function Teacher() {
-    const [visible, setVisible] = useState(false);
-    const [name, setName] = useState<string>("")
-    const [email, setEmail] = useState<string>("")
-    const [data, setData] = useState<FakeDataProps[]>([])
+export default function Teacher({ teachers }: Props) {
     const [modalVisible, setModalVisible] = useState<boolean>(false)
 
-    const handleChange = () => {
-        setVisible(!visible);
-    };
+    const [name, setName] = useState<string>("")
+    const [email, setEmail] = useState<string>("")
+    const [tableData, setTableData] = useState<teacher[]>(teachers ? teachers : [])
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
     }
 
-    useEffect(() => {
-        const fakeData = generateFakeUsers(10)
-        setData(fakeData)
-    }, [])
-
-    async function handleRegisterTeacher(formValue: Record<string, any> | null, event: React.FormEvent<HTMLFormElement> | undefined) {
+    async function handleRegisterTeacher(event: FormEvent) {
         event?.preventDefault();
 
         if (!name || !email) {
@@ -64,9 +52,11 @@ export default function Teacher() {
             return
         }
 
-        //Função para cadastro de professor
-
         try {
+            await api.post("/teachers", {
+                name: name,
+                email: email
+            })
 
             toaster.push(
                 <Notification type="success" header="Sucesso!">
@@ -77,7 +67,11 @@ export default function Teacher() {
             setName("")
             setEmail("")
         } catch (error) {
-
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao cadastrar professor!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            )
         }
 
     }
@@ -92,51 +86,50 @@ export default function Teacher() {
 
             <div className={styles.container}>
                 <div className={styles.containerForm}>
-                    <Form className={styles.form} onSubmit={handleRegisterTeacher}>
+                    <form className={styles.form} onSubmit={handleRegisterTeacher}>
+                        <div className={styles.formFields}>
+                            <div style={{ gridColumn: 'span 6' }}>
+                                <Label>Nome</Label>
+                                <Input
+                                    type="text"
+                                    value={name}
+                                    onChange={e => setName(e)}
+                                />
+                            </div>
 
-                        <Form.Group controlId="name">
-                            <Form.ControlLabel>Nome</Form.ControlLabel>
-                            <Form.Control
-                                name="name"
-                                value={name}
-                                onChange={e => setName(e)}
-                            />
+                            <div style={{ gridColumn: 'span 6' }}>
+                                <Label>Email</Label>
+                                <Input
+                                    type="email"
+                                    value={email}
+                                    onChange={e => setEmail(e)}
+                                />
+                            </div>
+                        </div>
 
-                        </Form.Group>
-
-                        <Form.Group controlId="email">
-                            <Form.ControlLabel>Email</Form.ControlLabel>
-                            <Form.Control
-                                name="email"
-                                type="email"
-                                value={email}
-                                onChange={e => setEmail(e)}
-                            />
-
-                        </Form.Group>
-
-                        <Form.Group>
+                        <div className={styles.containerButton}>
                             <ButtonToolbar>
                                 <Button appearance="primary" type="submit">
                                     Cadastrar
                                 </Button>
                             </ButtonToolbar>
-                        </Form.Group>
-
-                    </Form>
+                        </div>
+                    </form>
 
                 </div>
+
+                <Divider>Listagem de Professores</Divider>
 
                 <div className={styles.containerTable}>
                     <Table
                         height={400}
-                        data={data}
+                        data={tableData}
                         className={styles.table}
                     >
 
                         <Column flexGrow={1}>
                             <HeaderCell>Nome</HeaderCell>
-                            <Cell dataKey="firstName" />
+                            <Cell dataKey="name" />
                         </Column>
 
                         <Column flexGrow={1}>
@@ -170,3 +163,14 @@ export default function Teacher() {
         </>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = (async () => {
+    const teachers = await api.get("/teachers")
+
+    return {
+        props: {
+            teachers: teachers.data
+        }
+    }
+
+}) 

@@ -2,12 +2,10 @@ import { GetServerSidePropsContext } from "next";
 import axios, { AxiosError } from "axios";
 
 export function setupAPIClient(ctx?: GetServerSidePropsContext) {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI0NzI0MTY2LCJleHAiOjE3MjQ4MTA1NjZ9.XDVOs64H5NJUwK0q7XwikZAckumveluSya8YTJFOP1UF";
-
     const api = axios.create({
         baseURL: "http://localhost:3000",
         headers: {
-            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI0NzI0MTY2LCJleHAiOjE3MjQ4MTA1NjZ9.XDVOs64H5NJUwK0q7XwikZAckumveluSya8YTJFOP1U`
+            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI0ODczMTY0LCJleHAiOjE3MjQ5NTk1NjR9.RCJpf2ymQGLeN2-ZBraYOD7HDW-qv5w_fT5yOaqKrvo`
         }
     })
 
