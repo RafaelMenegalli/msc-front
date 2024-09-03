@@ -1,40 +1,42 @@
 import styles from "./styles.module.scss";
 import dayjs from 'dayjs'
-
-import { Modal, Form, Input, Button, DatePicker, SelectPicker, InputGroup } from "rsuite";
-import EyeIcon from '@rsuite/icons/legacy/Eye';
-import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
+import { Modal, Input, Button, DatePicker, SelectPicker } from "rsuite";
 import { useEffect, useState } from "react";
+import { teacher } from "@/pages/teacher";
 
 const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block', marginTop: 10 }} {...props} />;
 };
 
-// type ResponsePresenceType = {
-//     name: string;
-//     classTime: Date;
-// }
-
 interface LaunchPresenceModalProps {
     open: () => void;
     visible: boolean;
     registerPresence: () => void;
+    teachers: teacher[]
 }
 
-export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchPresenceModalProps) {
-    const [password, setPassword] = useState<string>('');
+export function LaunchPresenceModal({ open, visible, registerPresence, teachers }: LaunchPresenceModalProps) {
     const [initialDate, setInitialDate] = useState<Date>(new Date())
-    const [finalDate, setFinalDate] = useState<Date>()
-
-    const [visibleEye, setVisibleEye] = useState<boolean>(false)
-
-    function handleChange() {
-        setVisibleEye(!visibleEye)
-    }
+    const [finalDate, setFinalDate] = useState<Date | null>(null)
+    const [teacherList, setTeacherList] = useState<{ label: string, value: string }[]>([])
+    const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null)
+    const [studentCode, setStudentCode] = useState<string>("")
+    const [amountClass, setAmountClass] = useState<number>(0)
 
     useEffect(() => {
-        setFinalDate(dayjs(initialDate).add(1, 'hour').toDate());
-    }, [initialDate]);
+        if(amountClass) {
+            setFinalDate(dayjs(initialDate).add(amountClass, 'hour').toDate());
+        }
+    }, [amountClass]);
+
+    useEffect(() => {
+        if (teachers.length > 0) {
+            const formattedValue = teachers.map((item) => {
+                return { label: item.name, value: item.id };
+            });
+            setTeacherList(formattedValue);
+        }
+    }, [teachers])
 
 
     return (
@@ -51,24 +53,25 @@ export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchP
                 <Modal.Body>
                     <div className={styles.formContainer}>
                         <div className={styles.formGroup}>
-                            <Label>Senha do Aluno</Label>
-                            <InputGroup inside className={styles.inputGroup}>
-                                <Input
-                                    type={visibleEye ? 'text' : 'password'}
-                                    name="password"
-                                    value={password}
-                                    onChange={e => setPassword(e)}
-                                />
-                                <InputGroup.Button onClick={handleChange}>
-                                    {visibleEye ? <EyeIcon /> : <EyeSlashIcon />}
-                                </InputGroup.Button>
-                            </InputGroup>
+                            <Label>Código do aluno</Label>
+                            <Input
+                                type="text"
+                                maxLength={7}
+                                value={studentCode}
+                                onChange={(value) => {
+                                    const numericValue = value.replace(/\D/g, '')
+                                    setStudentCode(numericValue)
+                                }}
+                            />
                         </div>
                         <div className={styles.formGroup}>
                             <Label>Professor</Label>
                             <SelectPicker
-                                data={[{ value: 1, label: "Rafael" }]}
+                                data={teacherList}
                                 style={{ width: '100%' }}
+                                placeholder="Selecione um professor..."
+                                value={selectedTeacher}
+                                onChange={(e) => setSelectedTeacher(e)}
                             />
                         </div>
 
@@ -83,6 +86,13 @@ export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchP
                                     { value: 5, label: "5" }
                                 ]}
                                 style={{ width: '100%' }}
+                                placeholder="Selecione..."
+                                value={amountClass}
+                                onChange={(value) => {
+                                    if (value) {
+                                        setAmountClass(value)
+                                    }
+                                }}
                             />
                         </div>
 
@@ -105,6 +115,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchP
                                         format="HH:mm:ss"
                                         value={finalDate}
                                         disabled
+                                        placeholder="Selecione a Quantidade de Aulas"
                                     />
                                 </div>
                             </div>
@@ -112,11 +123,6 @@ export function LaunchPresenceModal({ open, visible, registerPresence }: LaunchP
                         <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={registerPresence}>Lançar</Button>
                     </div>
                 </Modal.Body>
-
-
-                {/* <Modal.Footer >
-                    <Button appearance="subtle" onClick={() => open()}>Cancelar</Button>
-                </Modal.Footer> */}
             </Modal >
         </>
     )

@@ -3,33 +3,18 @@ import { Header } from "@/components/Header";
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { LaunchPresenceModal } from "@/components/LaunchPresenceModal";
-
-import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Text } from 'rsuite';
-import TrashIcon from '@rsuite/icons/Trash';
-import EditIcon from '@rsuite/icons/Edit';
-
-import { faker } from "@faker-js/faker";
+import { GetServerSideProps } from "next";
+import { Button, Notification, toaster, Table, Text } from 'rsuite';
+import { api } from "@/services/apiClient";
+import { teacher } from "../teacher";
 
 const { Column, HeaderCell, Cell } = Table;
 
-function generateFakeUsers(count: number) {
-    return Array.from({ length: count }, () => ({
-        initialDate: faker.date.anytime().toLocaleString(),
-        student: faker.person.firstName(),
-        teacher: faker.person.firstName(),
-        finalDate: faker.date.anytime().toLocaleString()
-    }));
+interface PresencesProps {
+    teachers: teacher[]
 }
 
-interface FakeDataProps {
-    initialDate: string;
-    student: string;
-    teacher: string;
-    finalDate: string;
-}
-
-export default function Presences() {
-    const [data, setData] = useState<FakeDataProps[]>([])
+export default function Presences({ teachers }: PresencesProps) {
     const [modalVisible, setModalVisible] = useState<boolean>(false)
 
     const handleModalVisible = () => {
@@ -45,11 +30,6 @@ export default function Presences() {
 
         setModalVisible(false)
     }
-
-    useEffect(() => {
-        const fakeData = generateFakeUsers(20)
-        setData(fakeData)
-    }, [])
 
     return (
         <>
@@ -74,8 +54,19 @@ export default function Presences() {
                     open={handleModalVisible}
                     visible={modalVisible}
                     registerPresence={handleRegisterPresence}
+                    teachers={teachers}
                 />
             )}
         </>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = (async () => {
+    const teachers = await api.get("/teachers")
+
+    return {
+        props: {
+            teachers: teachers.data
+        }
+    }
+})

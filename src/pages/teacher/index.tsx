@@ -2,7 +2,9 @@ import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
 import { DeleteConfirmationTeacher } from "@/components/DeleteConfirmationTeacher";
 import { FormEvent, useEffect, useState } from "react";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
+import axios from "axios";
 
 import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Divider } from 'rsuite';
 import EyeIcon from '@rsuite/icons/legacy/Eye';
@@ -10,7 +12,6 @@ import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
 import TrashIcon from '@rsuite/icons/Trash';
 import EditIcon from '@rsuite/icons/Edit';
 
-import { GetServerSideProps } from "next";
 import { api } from "@/services/apiClient";
 
 const { Column, HeaderCell, Cell } = Table;
@@ -18,7 +19,7 @@ const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
 };
 
-type teacher = {
+export type teacher = {
     id: string;
     name: string;
     email: string;
@@ -67,11 +68,26 @@ export default function Teacher({ teachers }: Props) {
             setName("")
             setEmail("")
         } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toaster.push(
+                    <Notification type="error" header="Erro!">
+                        {error.response?.data.message}
+                    </Notification>, { placement: "bottomEnd", duration: 3500 }
+                )
+            }
+        }
+
+        try {
+            const response = await api.get("/teachers")
+            setTableData(response.data)
+        } catch (error) {
             toaster.push(
                 <Notification type="error" header="Erro!">
-                    Erro ao cadastrar professor!
+                    Erro ao buscar professores!
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
+
+            console.log("Erro ao buscar professores :::>> ", error)
         }
 
     }

@@ -10,13 +10,14 @@ import TrashIcon from '@rsuite/icons/Trash';
 import EditIcon from '@rsuite/icons/Edit';
 
 import { api } from "@/services/apiClient";
+import axios, { AxiosError } from "axios";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
 };
 
-type student = {
+export type student = {
     name: string;
     email: string;
     cpf: string;
@@ -43,7 +44,7 @@ export default function Student({ students }: Props) {
     async function handleRegisterStudent(event: FormEvent) {
         event?.preventDefault();
 
-        if (!name || !email) {
+        if (!name || !email || !cpf) {
             toaster.push(
                 <Notification type="warning" header="Aviso!">
                     Preencha todos os campos para cadastrar um aluno!
@@ -53,14 +54,13 @@ export default function Student({ students }: Props) {
             return
         }
 
-        const createStudentPassword = `${name}!`
-
         try {
+            const formattedCPF = cpf.replace(/\D/g, '')
+
             await api.post("/students", {
                 name: name,
                 email: email,
-                cpf: cpf,
-                password: createStudentPassword
+                cpf: formattedCPF
             })
 
             toaster.push(
@@ -73,13 +73,15 @@ export default function Student({ students }: Props) {
             setEmail("")
             setCpf("")
         } catch (error) {
-            toaster.push(
-                <Notification type="error" header="Erro!">
-                    Erro ao cadastrar aluno!
-                </Notification>, { placement: "bottomEnd", duration: 3500 }
-            )
+            if (axios.isAxiosError(error)) {
+                toaster.push(
+                    <Notification type="error" header="Erro!">
+                        {error?.response?.data.message[0]}
+                    </Notification>, { placement: "bottomEnd", duration: 3500 }
+                )
 
-            console.log("Erro ao cadastrar usuário :::>> ", error)
+                console.log("Erro ao cadastrar usuário :::>> ", error)
+            }
         }
 
         try {
