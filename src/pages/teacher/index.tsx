@@ -1,17 +1,12 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
 import { DeleteConfirmationTeacher } from "@/components/DeleteConfirmationTeacher";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import axios from "axios";
-
-import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Divider } from 'rsuite';
-import EyeIcon from '@rsuite/icons/legacy/Eye';
-import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
-import TrashIcon from '@rsuite/icons/Trash';
+import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
-
 import { api } from "@/services/apiClient";
 
 const { Column, HeaderCell, Cell } = Table;
@@ -153,17 +148,20 @@ export default function Teacher({ teachers }: Props) {
                             <Cell dataKey="email" />
                         </Column>
 
-                        <Column width={100} fixed="right">
+                        <Column width={75} fixed="right">
                             <HeaderCell>Ações</HeaderCell>
                             <Cell>
                                 {rowData => (
                                     <>
-                                        <Button className={styles.trashIcon} onClick={() => handleModalVisible()}><TrashIcon /></Button>
-                                        <Button className={styles.editIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
+                                        <EditIcon
+                                            className={styles.buttonEditIcon}
+                                            onClick={() => {
+                                                alert("Você está editando o professor: " + rowData.name)
+                                            }}
+                                        />
                                     </>
                                 )}
                             </Cell>
-
                         </Column>
 
                     </Table>

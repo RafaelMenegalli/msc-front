@@ -4,13 +4,10 @@ import { DeleteConfirmationStudent } from "@/components/DeleteConfirmationStuden
 import { FormEvent, useEffect, useState } from "react";
 import Head from "next/head";
 import { formatCPF } from "./utils/formatCPF";
-
-import { Form, ButtonToolbar, Button, Input, InputGroup, Notification, toaster, Table, Divider, Placeholder } from 'rsuite';
-import TrashIcon from '@rsuite/icons/Trash';
+import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
-
 import { api } from "@/services/apiClient";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -21,7 +18,7 @@ export type student = {
     name: string;
     email: string;
     cpf: string;
-    password: string;
+    rm: string;
 }
 
 interface Props {
@@ -29,6 +26,7 @@ interface Props {
 }
 
 export default function Student({ students }: Props) {
+    console.log({ students })
     const [modalVisible, setModalVisible] = useState<boolean>(false)
 
     const [name, setName] = useState<string>("")
@@ -175,13 +173,22 @@ export default function Student({ students }: Props) {
                             <Cell dataKey="email" />
                         </Column>
 
-                        <Column width={100} fixed="right">
+                        <Column flexGrow={1}>
+                            <HeaderCell>Código ( RM )</HeaderCell>
+                            <Cell dataKey="rm" />
+                        </Column>
+
+                        <Column width={75} fixed="right">
                             <HeaderCell>Ações</HeaderCell>
                             <Cell>
                                 {rowData => (
                                     <>
-                                        <Button className={styles.trashIcon} onClick={() => handleModalVisible()}><TrashIcon /></Button>
-                                        <Button className={styles.editIcon} onClick={() => alert(rowData.firstName)}><EditIcon /></Button>
+                                        <EditIcon
+                                        className={styles.buttonEditIcon}
+                                        onClick={() => {
+                                            alert("Você está editando o aluno: " + rowData.name)
+                                        }}
+                                        />
                                     </>
                                 )}
                             </Cell>

@@ -28,9 +28,14 @@ export function Header({ title }: HeaderProps) {
                     <Nav.Item as={Link} href="/dashboard">
                         Home
                     </Nav.Item>
-                    <Nav.Item as={Link} href="/presences">
-                        Presença
-                    </Nav.Item>
+                    <Nav.Menu title="Controle de Aulas">
+                        <Nav.Item as={Link} href="/presences">
+                            Lançamento de Presença
+                        </Nav.Item>
+                        <Nav.Item as={Link} href="/history_presences">
+                            Histórico de Presença
+                        </Nav.Item>
+                    </Nav.Menu>
                     <Nav.Menu title="Cadastros">
                         <Nav.Item as={Link} href="/student">
                             Aluno

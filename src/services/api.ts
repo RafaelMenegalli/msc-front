@@ -5,7 +5,7 @@ export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const api = axios.create({
         baseURL: "http://localhost:3000",
         headers: {
-            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI1MzE2Njk5LCJleHAiOjE3MjUzNDY2OTl9.OMdDleDrQuRElAaDiqfJB1Kdwdjk7Ba52qKdyFqp37g`
+            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI1NDE1NzUyLCJleHAiOjE3MjU0NDU3NTJ9.DCmBq8RugC7eMdmDKaDy_a2aPOtLgJgmkpFsgEbXdLI`
         }
     })
 

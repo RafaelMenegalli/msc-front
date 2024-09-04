@@ -37,7 +37,7 @@ export default function Presences({ teachers }: PresencesProps) {
                 <title>Controle de Aulas</title>
             </Head>
 
-            <Header title="Controle de Presença" />
+            <Header title="Lançamento de Presença" />
 
             <div className={styles.container}>
                 <div className={styles.containerButton}>
