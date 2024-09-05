@@ -3,9 +3,9 @@ import axios, { AxiosError } from "axios";
 
 export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const api = axios.create({
-        baseURL: "http://localhost:3000",
+        baseURL: "https://devoted-ambition-production.up.railway.app",
         headers: {
-            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI1NDE1NzUyLCJleHAiOjE3MjU0NDU3NTJ9.DCmBq8RugC7eMdmDKaDy_a2aPOtLgJgmkpFsgEbXdLI`
+            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI1NDkzODc4LCJleHAiOjE3MjgwODU4Nzh9.38tK-EL4PLkmaSkSryaQebNIQnusxkfSYG8xkkJMts8`
         }
     })
 

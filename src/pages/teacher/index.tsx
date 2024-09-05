@@ -15,7 +15,7 @@ const Label = (props: any) => {
 };
 
 export type teacher = {
-    id: string;
+    id: number;
     name: string;
     email: string;
 }

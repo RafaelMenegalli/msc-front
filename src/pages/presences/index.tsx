@@ -5,6 +5,9 @@ import Head from "next/head";
 import { LaunchPresenceModal } from "@/components/LaunchPresenceModal";
 import { GetServerSideProps } from "next";
 import { Button, Notification, toaster, Table, Text } from 'rsuite';
+import MenuIcon from '@rsuite/icons/Menu';
+import ArrowDownLineIcon from '@rsuite/icons/ArrowDownLine';
+import ArrowUpLineIcon from '@rsuite/icons/ArrowUpLine';
 import { api } from "@/services/apiClient";
 import { teacher } from "../teacher";
 
@@ -16,6 +19,7 @@ interface PresencesProps {
 
 export default function Presences({ teachers }: PresencesProps) {
     const [modalVisible, setModalVisible] = useState<boolean>(false)
+    const [showHeader, setShowHeader] = useState<boolean>(false)
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
@@ -37,7 +41,19 @@ export default function Presences({ teachers }: PresencesProps) {
                 <title>Controle de Aulas</title>
             </Head>
 
-            <Header title="Lançamento de Presença" />
+            {showHeader ? (
+                <>
+                    <Header title="Lançamento de Presença" />
+                    <div className={styles.containerMenuIcon}>
+                        <ArrowUpLineIcon className={styles.arrowIcon} onClick={() => setShowHeader(!showHeader)} />
+                    </div>
+                </>
+            ) : (
+                <div className={styles.containerMenuIcon}>
+                    <ArrowDownLineIcon className={styles.arrowIcon} onClick={() => setShowHeader(!showHeader)} />
+                </div>
+            )}
+
 
             <div className={styles.container}>
                 <div className={styles.containerButton}>

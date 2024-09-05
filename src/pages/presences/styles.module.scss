@@ -1,10 +1,22 @@
 .container {
     width: 100%;
-    height: calc(100vh - 156px);
+    height: 75vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.containerMenuIcon {
+    display: flex;
+    justify-content: flex-start;
+    height: 2rem;
+    padding: 1rem;
+}
+
+.arrowIcon {
+    cursor: pointer;
+    font-size: 1.5rem;
 }
 
 .containerButton {

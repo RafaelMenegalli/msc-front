@@ -15,6 +15,7 @@ const Label = (props: any) => {
 };
 
 export type student = {
+    id: number;
     name: string;
     email: string;
     cpf: string;

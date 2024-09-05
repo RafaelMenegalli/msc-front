@@ -24,7 +24,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
     const [amountClass, setAmountClass] = useState<number>(0)
 
     useEffect(() => {
-        if(amountClass) {
+        if (amountClass) {
             setFinalDate(dayjs(initialDate).add(amountClass, 'hour').toDate());
         }
     }, [amountClass]);
