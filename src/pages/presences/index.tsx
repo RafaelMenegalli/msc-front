@@ -10,8 +10,7 @@ import ArrowDownLineIcon from '@rsuite/icons/ArrowDownLine';
 import ArrowUpLineIcon from '@rsuite/icons/ArrowUpLine';
 import { api } from "@/services/apiClient";
 import { teacher } from "../teacher";
-
-const { Column, HeaderCell, Cell } = Table;
+import axios from "axios";
 
 interface PresencesProps {
     teachers: teacher[]
@@ -25,14 +24,47 @@ export default function Presences({ teachers }: PresencesProps) {
         setModalVisible(!modalVisible)
     }
 
-    async function handleRegisterPresence() {
-        toaster.push(
-            <Notification type="success" header="Sucesso!">
-                Prenseça registrada com sucesso!
-            </Notification>, { placement: "bottomEnd", duration: 3500 }
-        )
+    async function handleRegisterPresence(studentCode: string, selectedTeacher: string | null, amountClass: number) {
+        console.log({ studentCode })
+        console.log({ selectedTeacher })
+        console.log({ amountClass })
 
-        setModalVisible(false)
+        if (!studentCode || !selectedTeacher || !amountClass) {
+            toaster.push(
+                <Notification type="warning" header="Aviso!">
+                    Preencha todas as informações para lançar uma presença!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            )
+
+            return
+        }
+
+        try {
+            await api.post("/presence", {
+                studentRM: studentCode,
+                teacherId: selectedTeacher,
+                quantityOfClasses: amountClass
+            })
+
+            toaster.push(
+                <Notification type="success" header="Sucesso!">
+                    Presença registrada com sucesso!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            )
+
+            setModalVisible(false)
+        } catch (error) {
+            console.log("Erro ao lançar presença ::::>> ", error)
+            if (axios.isAxiosError(error)) {
+                toaster.push(
+                    <Notification type="error" header="Erro!">
+                        {error?.response?.data.message}
+                    </Notification>, { placement: "bottomEnd", duration: 3500 }
+                )
+
+                console.log("Erro ao cadastrar usuário :::>> ", error)
+            }
+        }
     }
 
     return (

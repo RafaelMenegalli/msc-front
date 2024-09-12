@@ -11,7 +11,7 @@ const Label = (props: any) => {
 interface LaunchPresenceModalProps {
     open: () => void;
     visible: boolean;
-    registerPresence: () => void;
+    registerPresence: (studentCode: string, selectedTeacher: string | null, amountClass: number) => void;
     teachers: teacher[]
 }
 
@@ -32,7 +32,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
     useEffect(() => {
         if (teachers.length > 0) {
             const formattedValue = teachers.map((item) => {
-                return { label: item.name, value: item.id };
+                return { label: item.name, value: String(item.id) };
             });
             setTeacherList(formattedValue);
         }
@@ -120,7 +120,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
                                 </div>
                             </div>
                         </div>
-                        <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={registerPresence}>Lançar</Button>
+                        <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={() => registerPresence(studentCode, selectedTeacher, amountClass)}>Lançar</Button>
                     </div>
                 </Modal.Body>
             </Modal >

@@ -51,7 +51,7 @@ export function Header({ title }: HeaderProps) {
             <span className={styles.title}>{title}</span>
 
             <Nav>
-                <Nav.Item icon={<CogIcon />}>Configurações</Nav.Item>
+                <Nav.Item icon={<CogIcon />} as={Link} href="/settings">Configurações</Nav.Item>
             </Nav>
         </Navbar>
     );

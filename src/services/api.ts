@@ -5,7 +5,7 @@ export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const api = axios.create({
         baseURL: "https://devoted-ambition-production.up.railway.app",
         headers: {
-            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI1NDkzODc4LCJleHAiOjE3MjgwODU4Nzh9.38tK-EL4PLkmaSkSryaQebNIQnusxkfSYG8xkkJMts8`
+            authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoicmFmYWVsIiwiZW1haWwiOiJyYWZhZWxAZ21haWwuY29tIiwiaWF0IjoxNzI2MDkyNjA5LCJleHAiOjE3Mjg2ODQ2MDl9.W3o0taHTCwhR0pWFtHll8DlunyfV4HZRJ8TzlM3Mw98`
         }
     })
 
