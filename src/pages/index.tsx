@@ -3,19 +3,24 @@ import { Input, InputGroup, Button, ButtonToolbar, Panel, toaster, Notification 
 import AvatarIcon from '@rsuite/icons/legacy/Avatar';
 import EyeIcon from '@rsuite/icons/legacy/Eye';
 import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
-import { FormEvent, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import Head from "next/head";
-import { api } from "@/services/apiClient";
 import { useRouter } from "next/router";
+import { AuthContext } from "@/contexts/AuthContext";
+import { canSSTGuest } from "@/utils/canSSRGuest";
 
 const Label = (props: any) => {
   return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
 };
 
 export default function Home() {
+  const { signIn } = useContext(AuthContext);
+
   const [visible, setVisible] = useState(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false)
+
   const router = useRouter()
 
   const handleChange = () => {
@@ -24,6 +29,7 @@ export default function Home() {
 
   async function handleLogin(event: FormEvent) {
     event.preventDefault()
+    setLoading(true)
 
     if (!email || !password) {
       toaster.push(
@@ -32,31 +38,18 @@ export default function Home() {
         </Notification>, { duration: 3500, placement: 'bottomEnd' }
       )
 
+      setLoading(false)
+
       return
     }
 
-    try {
-      await api.post("/auth/login", {
-        email: email,
-        password: password
-      })
-
-      toaster.push(
-        <Notification type="success" header="Sucesso!">
-          Login efetuado com sucesso!
-        </Notification>, { duration: 3500, placement: 'bottomEnd' }
-      )
-
-      router.push('/dashboard')
-    } catch (error) {
-      console.log("Erro ao logar ::::>> ", error)
-      toaster.push(
-        <Notification type="error" header="Erro!">
-          Email ou Senha Inválido!
-        </Notification>, { duration: 3500, placement: 'bottomEnd' }
-      )
+    let data = {
+      email, password
     }
 
+    await signIn(data)
+
+    setLoading(false)
   }
 
   return (
@@ -66,7 +59,6 @@ export default function Home() {
       </Head>
       <div className={styles.container}>
         <Panel shaded bordered bodyFill className={styles.containerCard}>
-          <h1 className={styles.title}>Página de Login (Logo da Escola)</h1>
           <form className={styles.form} onSubmit={handleLogin}>
             <InputGroup>
               <InputGroup.Addon>
@@ -91,7 +83,7 @@ export default function Home() {
               </InputGroup.Button>
             </InputGroup>
             <ButtonToolbar>
-              <Button appearance="primary" className={styles.submitButton} type="submit">Entrar</Button>
+              <Button appearance="primary" className={styles.submitButton} type="submit" loading={loading}>Entrar</Button>
             </ButtonToolbar>
           </form>
         </Panel>
@@ -99,3 +91,9 @@ export default function Home() {
     </>
   )
 }
+
+export const getServerSideProps = canSSTGuest(async (ctx) => {
+  return {
+    props: {}
+  }
+})

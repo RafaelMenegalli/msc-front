@@ -8,6 +8,7 @@ import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Pl
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import axios from "axios";
+import { canSSRAuth } from "@/utils/canSSRAuth";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -208,7 +209,7 @@ export default function Student({ students }: Props) {
     )
 }
 
-export const getServerSideProps = (async () => {
+export const getServerSideProps = canSSRAuth(async () => {
     const students = await api.get("/students")
 
     return {

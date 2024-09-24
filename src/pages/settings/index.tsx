@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { api } from "@/services/apiClient";
 import { Button, Input, InputGroup, Notification, toaster } from "rsuite";
+import { canSSRAuth } from "@/utils/canSSRAuth";
 
 const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
@@ -86,7 +87,7 @@ export default function Settings({ settings }: SettingsProps) {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = (async () => {
+export const getServerSideProps = canSSRAuth(async () => {
     try {
         const settings = await api.get("/config")
 

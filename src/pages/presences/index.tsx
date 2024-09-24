@@ -11,14 +11,22 @@ import ArrowUpLineIcon from '@rsuite/icons/ArrowUpLine';
 import { api } from "@/services/apiClient";
 import { teacher } from "../teacher";
 import axios from "axios";
+import { canSSRAuth } from "@/utils/canSSRAuth";
+import dayjs from "dayjs";
 
 interface PresencesProps {
     teachers: teacher[]
 }
 
+type lastStudentClass = {
+    name: string;
+    date: string;
+}
+
 export default function Presences({ teachers }: PresencesProps) {
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [showHeader, setShowHeader] = useState<boolean>(false)
+    const [lastStudent, setLastStudent] = useState<lastStudentClass>()
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
@@ -61,9 +69,20 @@ export default function Presences({ teachers }: PresencesProps) {
                         {error?.response?.data.message}
                     </Notification>, { placement: "bottomEnd", duration: 3500 }
                 )
-
-                console.log("Erro ao cadastrar usuário :::>> ", error)
             }
+        }
+
+        try {
+            const response = await api.get(`/students/rm/${studentCode}`);
+
+            console.log({ response })
+        } catch (error) {
+            console.log("Erro ao buscar aluno pelo RM :::>> ", error)
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao buscar aluno!
+                </Notification>, { placement: 'bottomEnd', duration: 3500 }
+            )
         }
     }
 
@@ -93,7 +112,7 @@ export default function Presences({ teachers }: PresencesProps) {
                 </div>
 
                 <div className={styles.containerText}>
-                    <Text>Presença para o aluno: <strong className={styles.evidenceText}>Eduardo Moia</strong> foi registrada - 23/08/2024 18:30</Text>
+                    <Text>Presença para o aluno: <strong className={styles.evidenceText}>{lastStudent?.name}</strong> foi registrada - {lastStudent?.date}</Text>
                 </div>
             </div>
 
@@ -109,7 +128,7 @@ export default function Presences({ teachers }: PresencesProps) {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = (async () => {
+export const getServerSideProps = canSSRAuth(async () => {
     const teachers = await api.get("/teachers")
 
     return {

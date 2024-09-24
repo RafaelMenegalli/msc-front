@@ -7,6 +7,7 @@ import { Modal, Input, Button, DatePicker, SelectPicker, Divider, Table } from "
 import { student } from "../student";
 import { teacher } from "../teacher";
 import { api } from "@/services/apiClient";
+import { canSSRAuth } from "@/utils/canSSRAuth";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -162,7 +163,7 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
     );
 }
 
-export const getServerSideProps: GetServerSideProps = (async () => {
+export const getServerSideProps = canSSRAuth(async () => {
     try {
         const students = await api.get("/students");
         const teachers = await api.get("/teachers")

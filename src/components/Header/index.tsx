@@ -1,14 +1,18 @@
 import styles from "./styles.module.scss";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Link from "next/link";
-import { Navbar, Nav } from "rsuite";
+import { Navbar, Nav, Button } from "rsuite";
 import CogIcon from '@rsuite/icons/legacy/Cog';
+import ExitIcon from '@rsuite/icons/Exit';
+import { AuthContext } from "@/contexts/AuthContext";
 
 interface HeaderProps {
     title: string;
 }
 
 export function Header({ title }: HeaderProps) {
+    const { signOut } = useContext(AuthContext)
+
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -51,7 +55,10 @@ export function Header({ title }: HeaderProps) {
             <span className={styles.title}>{title}</span>
 
             <Nav>
-                <Nav.Item icon={<CogIcon />} as={Link} href="/settings">Configurações</Nav.Item>
+                <Nav.Menu title="Configurações">
+                    <Nav.Item icon={<CogIcon />} as={Link} href="/settings">Configurações Gerais</Nav.Item>
+                    <Nav.Item icon={<ExitIcon />} as={Button} onClick={signOut} className={styles.exitButton}>Sair</Nav.Item>
+                </Nav.Menu>
             </Nav>
         </Navbar>
     );
