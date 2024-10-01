@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { DeleteConfirmationStudent } from "@/components/DeleteConfirmationStudent";
 import { FormEvent, useEffect, useState } from "react";
 import Head from "next/head";
-import { formatCPF } from "./utils/formatCPF";
+import { formatCPF } from "../../utils/formatCPF";
 import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
