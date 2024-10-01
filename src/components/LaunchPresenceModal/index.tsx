@@ -16,18 +16,18 @@ interface LaunchPresenceModalProps {
 }
 
 export function LaunchPresenceModal({ open, visible, registerPresence, teachers }: LaunchPresenceModalProps) {
-    const [initialDate, setInitialDate] = useState<Date>(new Date())
-    const [finalDate, setFinalDate] = useState<Date | null>(null)
+    // const [initialDate, setInitialDate] = useState<Date>(new Date())
+    // const [finalDate, setFinalDate] = useState<Date | null>(null)
     const [teacherList, setTeacherList] = useState<{ label: string, value: string }[]>([])
     const [selectedTeacher, setSelectedTeacher] = useState<string | null>(null)
     const [studentCode, setStudentCode] = useState<string>("")
     const [amountClass, setAmountClass] = useState<number>(0)
 
-    useEffect(() => {
-        if (amountClass) {
-            setFinalDate(dayjs(initialDate).add(amountClass, 'hour').toDate());
-        }
-    }, [amountClass]);
+    // useEffect(() => {
+    //     if (amountClass) {
+    //         setFinalDate(dayjs(initialDate).add(amountClass, 'hour').toDate());
+    //     }
+    // }, [amountClass]);
 
     useEffect(() => {
         if (teachers.length > 0) {
@@ -80,10 +80,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
                             <SelectPicker
                                 data={[
                                     { value: 1, label: "1" },
-                                    { value: 2, label: "2" },
-                                    { value: 3, label: "3" },
-                                    { value: 4, label: "4" },
-                                    { value: 5, label: "5" }
+                                    { value: 2, label: "2" }
                                 ]}
                                 style={{ width: '100%' }}
                                 placeholder="Selecione..."
@@ -96,7 +93,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
                             />
                         </div>
 
-                        <div className={styles.formGroup}>
+                        {/* <div className={styles.formGroup}>
                             <div className={styles.containerDates}>
                                 <div>
                                     <Label>Horário de Início</Label>
@@ -119,7 +116,7 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
                                     />
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                         <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={() => registerPresence(studentCode, selectedTeacher, amountClass)}>Lançar</Button>
                     </div>
                 </Modal.Body>

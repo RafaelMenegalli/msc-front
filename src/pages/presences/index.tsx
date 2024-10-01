@@ -14,6 +14,8 @@ import axios from "axios";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import dayjs from "dayjs";
 
+
+
 interface PresencesProps {
     teachers: teacher[]
 }
@@ -33,10 +35,6 @@ export default function Presences({ teachers }: PresencesProps) {
     }
 
     async function handleRegisterPresence(studentCode: string, selectedTeacher: string | null, amountClass: number) {
-        console.log({ studentCode })
-        console.log({ selectedTeacher })
-        console.log({ amountClass })
-
         if (!studentCode || !selectedTeacher || !amountClass) {
             toaster.push(
                 <Notification type="warning" header="Aviso!">
@@ -48,7 +46,7 @@ export default function Presences({ teachers }: PresencesProps) {
         }
 
         try {
-            await api.post("/presence", {
+            const response = await api.post("/presence", {
                 studentRM: studentCode,
                 teacherId: selectedTeacher,
                 quantityOfClasses: amountClass
@@ -60,6 +58,14 @@ export default function Presences({ teachers }: PresencesProps) {
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
+            const formattedStartDate = dayjs(response.data?.startsAt).add(3, 'hour').format("DD/MM/YYYY HH:mm:ss")
+
+            const lastStudentData: lastStudentClass = {
+                name: response.data.student.name,
+                date: formattedStartDate
+            }
+
+            setLastStudent(lastStudentData)
             setModalVisible(false)
         } catch (error) {
             console.log("Erro ao lançar presença ::::>> ", error)
@@ -74,8 +80,6 @@ export default function Presences({ teachers }: PresencesProps) {
 
         try {
             const response = await api.get(`/students/rm/${studentCode}`);
-
-            console.log({ response })
         } catch (error) {
             console.log("Erro ao buscar aluno pelo RM :::>> ", error)
             toaster.push(
@@ -111,9 +115,11 @@ export default function Presences({ teachers }: PresencesProps) {
                     <Button appearance="primary" color="cyan" size="lg" className={styles.presenceButton} onClick={handleModalVisible}>Lançar Presença</Button>
                 </div>
 
-                <div className={styles.containerText}>
-                    <Text>Presença para o aluno: <strong className={styles.evidenceText}>{lastStudent?.name}</strong> foi registrada - {lastStudent?.date}</Text>
-                </div>
+                {lastStudent && (
+                    <div className={styles.containerText}>
+                        <Text>Presença para o aluno: <strong className={styles.evidenceText}>{lastStudent?.name}</strong> foi registrada - {lastStudent?.date}</Text>
+                    </div>
+                )}
             </div>
 
             {modalVisible && (
@@ -133,7 +139,7 @@ export const getServerSideProps = canSSRAuth(async () => {
 
     return {
         props: {
-            teachers: teachers.data
+            teachers: teachers ? teachers.data : []
         }
     }
 })

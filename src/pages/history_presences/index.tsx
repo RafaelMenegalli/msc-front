@@ -1,13 +1,15 @@
 import styles from "./styles.module.scss";
 import { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
 import { Header } from "@/components/Header";
 import Head from "next/head";
-import { Modal, Input, Button, DatePicker, SelectPicker, Divider, Table } from "rsuite";
+import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification } from "rsuite";
+import TagFilterIcon from '@rsuite/icons/TagFilter';
+import CloseIcon from '@rsuite/icons/Close';
 import { student } from "../student";
 import { teacher } from "../teacher";
 import { api } from "@/services/apiClient";
 import { canSSRAuth } from "@/utils/canSSRAuth";
+import dayjs from "dayjs";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -15,12 +17,33 @@ const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block' }} {...props} />;
 };
 
-interface HistoryPresencesProps {
-    students: student[],
-    teachers: teacher[]
+type Presence = {
+    id: number;
+    student: {
+        id: number;
+        name: string;
+        email: string;
+    }
+    teacher: {
+        id: number;
+        name: string;
+        email: string;
+    }
+    quantityOfClasses: number;
+    startsAt: Date | string;
+    endsAt: Date | string;
 }
 
-export default function HistoryPresences({ students, teachers }: HistoryPresencesProps) {
+interface HistoryPresencesProps {
+    students: student[],
+    teachers: teacher[],
+    presences: Presence[]
+}
+
+
+export default function HistoryPresences({ students, teachers, presences }: HistoryPresencesProps) {
+    console.log({ presences })
+
     const [sortColumn, setSortColumn] = useState<string | undefined>();
     const [sortType, setSortType] = useState<'asc' | 'desc' | undefined>();
     const [loading, setLoading] = useState(false);
@@ -28,19 +51,9 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
     const [teacherList, setTeacherList] = useState<{ label: string, value: number }[]>([])
     const [selectedStudent, setSelectedStudent] = useState<number | null>(null)
     const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null)
-    const [date, setDate] = useState<Date | null>(null)
-    const [data, setData] = useState([
-        { student: "Rafael", teacher: "Eduardo", amountClass: 4, initialDate: "22/22/2005", finalDate: "11/11/2005" },
-        { student: "Maria", teacher: "João", amountClass: 6, initialDate: "03/03/2010", finalDate: "09/09/2010" },
-        { student: "Carlos", teacher: "Ana", amountClass: 5, initialDate: "15/07/2012", finalDate: "15/12/2012" },
-        { student: "Fernanda", teacher: "Ricardo", amountClass: 3, initialDate: "01/04/2018", finalDate: "30/04/2018" },
-        { student: "Lucas", teacher: "Mariana", amountClass: 7, initialDate: "20/02/2015", finalDate: "20/08/2015" },
-        { student: "Julia", teacher: "Paulo", amountClass: 2, initialDate: "10/10/2019", finalDate: "20/11/2019" },
-        { student: "Pedro", teacher: "Camila", amountClass: 8, initialDate: "05/05/2014", finalDate: "05/12/2014" },
-        { student: "Larissa", teacher: "Felipe", amountClass: 4, initialDate: "12/12/2020", finalDate: "12/04/2021" },
-        { student: "Gabriel", teacher: "Roberta", amountClass: 6, initialDate: "07/07/2017", finalDate: "07/12/2017" },
-        { student: "Marcos", teacher: "Vanessa", amountClass: 9, initialDate: "03/03/2011", finalDate: "03/09/2011" }
-    ]);
+    const [initialDate, setInitialDate] = useState<Date | null>(null)
+    const [finalDate, setFinalDate] = useState<Date | null>(null)
+    const [presenceList, setPresenceList] = useState<Presence[]>(presences)
 
     useEffect(() => {
         const formatStudent = students.map((item) => {
@@ -61,7 +74,7 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
         // Definindo um valor padrão para sortType caso seja undefined
         const finalSortType = sortType || 'asc';
 
-        const sortedData = [...data].sort((a, b) => {
+        const sortedData = [...presenceList].sort((a, b) => {
             const aValue = a[sortColumn as keyof typeof a];
             const bValue = b[sortColumn as keyof typeof b];
 
@@ -76,8 +89,63 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
             setLoading(false);
             setSortColumn(sortColumn);
             setSortType(finalSortType);
-            setData(sortedData);
+            setPresenceList(sortedData);
         }, 500);
+    }
+
+    async function handleClearFilters() {
+        setLoading(true)
+        setSelectedStudent(null)
+        setSelectedTeacher(null)
+        setInitialDate(null)
+        setFinalDate(null)
+
+        try {
+            const response = await api.get("/presence")
+            setPresenceList(response.data)
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao filtrar aulas!
+                </Notification>, { placement: 'bottomEnd', duration: 3500 }
+            )
+        }
+    }
+
+    async function handleFilterData() {
+        setLoading(true)
+
+        try {
+            const convertInitalDate = new Date(initialDate ? initialDate : "")
+            const convertFinalDate = new Date(finalDate ? finalDate : "")
+
+            const formattedInitialDate = dayjs(convertInitalDate).format("YYYY-MM-DD") !== 'Invalid Date' ? dayjs(convertInitalDate).format("YYYY-MM-DD") : null;
+            const formattedFinalDate = dayjs(convertFinalDate).format("YYYY-MM-DD") !== 'Invalid Date' ? dayjs(convertFinalDate).format("YYYY-MM-DD") : null;
+
+            console.log({ formattedInitialDate })
+            console.log({ formattedFinalDate })
+
+            const response = await api.get('/presence', {
+                params: {
+                    studentId: selectedStudent,
+                    teacherId: selectedTeacher,
+                    startDate: formattedInitialDate,
+                    endDate: formattedFinalDate
+                }
+            });
+
+            setPresenceList(response.data)
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao filtrar aulas!
+                </Notification>, { placement: 'bottomEnd', duration: 3500 }
+            )
+        }
     }
 
     return (
@@ -112,50 +180,89 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
                         />
                     </div>
 
-                    <div style={{ gridColumn: 'span 3' }}>
-                        <Label>Data</Label>
+                    <div style={{ gridColumn: 'span 2' }}>
+                        <Label>Data de Início</Label>
                         <DatePicker
                             format="dd/MM/yyyy"
                             placeholder="Escolha uma data..."
-                            value={date}
-                            onChange={(value) => setDate(value)}
+                            value={initialDate}
+                            onChange={(value) => setInitialDate(value)}
+                            className={styles.dateInput}
                         />
                     </div>
+
+                    <div style={{ gridColumn: 'span 2' }}>
+                        <Label>Data de Fim</Label>
+                        <DatePicker
+                            format="dd/MM/yyyy"
+                            placeholder="Escolha uma data..."
+                            value={finalDate}
+                            onChange={(value) => setFinalDate(value)}
+                            className={styles.dateInput}
+                        />
+                    </div>
+                </div>
+                <div className={styles.containerButton}>
+                    <ButtonToolbar>
+                        <Button appearance="primary" type="submit" color="violet" startIcon={<TagFilterIcon />} onClick={handleFilterData}>
+                            Filtrar
+                        </Button>
+                        <Button appearance="primary" type="submit" color="cyan" startIcon={<CloseIcon />} onClick={handleClearFilters}>
+                            Limpar Filtros
+                        </Button>
+                    </ButtonToolbar>
                 </div>
                 <Divider>Aulas</Divider>
                 <div className={styles.tableContainer}>
                     <Table
                         height={420}
-                        data={data}
+                        data={presenceList}
                         sortColumn={sortColumn}
                         sortType={sortType}
                         onSortColumn={handleSortColumn}
                         loading={loading}
                     >
-                        <Column flexGrow={1} align="center" sortable>
+
+                        {/* Coluna para exibir o nome do aluno */}
+                        <Column flexGrow={1} align="center">
                             <HeaderCell>Aluno</HeaderCell>
-                            <Cell dataKey="student" />
+                            <Cell dataKey="student">
+                                {(rowData: Presence) => rowData.student.name}
+                            </Cell>
                         </Column>
 
-                        <Column flexGrow={1} sortable>
+                        {/* Coluna para exibir o nome do professor */}
+                        <Column flexGrow={1} align="center">
                             <HeaderCell>Professor</HeaderCell>
-                            <Cell dataKey="teacher" />
+                            <Cell dataKey="teacher">
+                                {(rowData: Presence) => rowData.teacher.name}
+                            </Cell>
                         </Column>
 
-                        <Column flexGrow={1} sortable>
+                        {/* Coluna para exibir a quantidade de aulas */}
+                        <Column flexGrow={1} align="center" sortable>
                             <HeaderCell>Quantidade de Aulas</HeaderCell>
-                            <Cell dataKey="amountClass" />
+                            <Cell dataKey="quantityOfClasses">
+                                {(rowData: Presence) => rowData.quantityOfClasses}
+                            </Cell>
                         </Column>
 
-                        <Column flexGrow={1} sortable>
-                            <HeaderCell>Inicio Aula</HeaderCell>
-                            <Cell dataKey="initialDate" />
+                        {/* Coluna para exibir a data de início da aula */}
+                        <Column flexGrow={1} align="center" sortable>
+                            <HeaderCell>Início Aula</HeaderCell>
+                            <Cell dataKey="startsAt">
+                                {(rowData: Presence) => dayjs(rowData.startsAt).add(3, 'hour').format("DD/MM/YYYY HH:mm:ss")}
+                            </Cell>
                         </Column>
 
-                        <Column flexGrow={1} sortable>
+                        {/* Coluna para exibir a data de término da aula */}
+                        <Column flexGrow={1} align="center" sortable>
                             <HeaderCell>Fim Aula</HeaderCell>
-                            <Cell dataKey="finalDate" />
+                            <Cell dataKey="endsAt">
+                                {(rowData: Presence) => dayjs(rowData.endsAt).add(3, 'hour').format("DD/MM/YYYY HH:mm:ss")}
+                            </Cell>
                         </Column>
+
                     </Table>
                 </div>
             </div>
@@ -166,12 +273,14 @@ export default function HistoryPresences({ students, teachers }: HistoryPresence
 export const getServerSideProps = canSSRAuth(async () => {
     try {
         const students = await api.get("/students");
-        const teachers = await api.get("/teachers")
+        const teachers = await api.get("/teachers");
+        const presences = await api.get("/presence");
 
         return {
             props: {
                 students: students.data,
-                teachers: teachers.data
+                teachers: teachers.data,
+                presences: presences.data
             }
         }
     } catch (error) {
@@ -179,7 +288,8 @@ export const getServerSideProps = canSSRAuth(async () => {
         return {
             props: {
                 students: [],
-                teachers: []
+                teachers: [],
+                presences: []
             }
         }
     }

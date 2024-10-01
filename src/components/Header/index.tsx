@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Navbar, Nav, Button } from "rsuite";
 import CogIcon from '@rsuite/icons/legacy/Cog';
 import ExitIcon from '@rsuite/icons/Exit';
+import UserBadgeIcon from '@rsuite/icons/UserBadge';
 import { AuthContext } from "@/contexts/AuthContext";
 
 interface HeaderProps {
@@ -57,6 +58,7 @@ export function Header({ title }: HeaderProps) {
             <Nav>
                 <Nav.Menu title="Configurações">
                     <Nav.Item icon={<CogIcon />} as={Link} href="/settings">Configurações Gerais</Nav.Item>
+                    <Nav.Item icon={<UserBadgeIcon />} as={Link} href="/users">Usuários</Nav.Item>
                     <Nav.Item icon={<ExitIcon />} as={Button} onClick={signOut} className={styles.exitButton}>Sair</Nav.Item>
                 </Nav.Menu>
             </Nav>

@@ -80,7 +80,7 @@ export default function Student({ students }: Props) {
                     </Notification>, { placement: "bottomEnd", duration: 3500 }
                 )
 
-                console.log("Erro ao cadastrar usuário :::>> ", error)
+                console.log("Erro ao cadastrar Aluno :::>> ", error)
             }
         }
 
@@ -94,7 +94,7 @@ export default function Student({ students }: Props) {
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
-            console.log("Erro ao buscar usuário :::>> ", error)
+            console.log("Erro ao buscar Aluno :::>> ", error)
         }
 
     }
@@ -143,7 +143,7 @@ export default function Student({ students }: Props) {
 
                         <div className={styles.containerButton}>
                             <ButtonToolbar>
-                                <Button appearance="primary" type="submit">
+                                <Button appearance="primary" type="submit" color="green">
                                     Cadastrar
                                 </Button>
                             </ButtonToolbar>
@@ -186,10 +186,10 @@ export default function Student({ students }: Props) {
                                 {rowData => (
                                     <>
                                         <EditIcon
-                                        className={styles.buttonEditIcon}
-                                        onClick={() => {
-                                            alert("Você está editando o aluno: " + rowData.name)
-                                        }}
+                                            className={styles.buttonEditIcon}
+                                            onClick={() => {
+                                                alert("Você está editando o aluno: " + rowData.name)
+                                            }}
                                         />
                                     </>
                                 )}

@@ -1,48 +1,48 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
-import { DeleteConfirmationTeacher } from "@/components/DeleteConfirmationTeacher";
 import { FormEvent, useState } from "react";
-import { GetServerSideProps } from "next";
+import { canSSRAuth } from "@/utils/canSSRAuth";
 import Head from "next/head";
-import axios from "axios";
-import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider } from 'rsuite';
+import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder, InputGroup } from 'rsuite';
+import EyeIcon from '@rsuite/icons/legacy/Eye';
+import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
-import { canSSRAuth } from "@/utils/canSSRAuth";
+import axios from "axios";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block', paddingBottom: "0.2rem" }} {...props} />;
 };
 
-export type teacher = {
-    id: number;
+type User = {
     name: string;
     email: string;
 }
 
-interface Props {
-    teachers: teacher[]
+interface UsersProps {
+    users: User[]
 }
 
-export default function Teacher({ teachers }: Props) {
-    const [modalVisible, setModalVisible] = useState<boolean>(false)
-
+export default function Users({ users }: UsersProps) {
+    console.log({ users })
+    const [visible, setVisible] = useState(false);
     const [name, setName] = useState<string>("")
     const [email, setEmail] = useState<string>("")
-    const [tableData, setTableData] = useState<teacher[]>(teachers ? teachers : [])
+    const [password, setPassword] = useState<string>("")
+    const [userList, setUserList] = useState<User[]>(users)
 
-    const handleModalVisible = () => {
-        setModalVisible(!modalVisible)
-    }
+    const handleChange = () => {
+        setVisible(!visible);
+    };
 
-    async function handleRegisterTeacher(event: FormEvent) {
-        event?.preventDefault();
+    async function handleRegisterUser(event: FormEvent) {
+        event.preventDefault()
 
-        if (!name || !email) {
+        if (!name || !email || !password) {
             toaster.push(
                 <Notification type="warning" header="Aviso!">
-                    Preencha todos os campos para cadastrar um professor!
+                    Preencha todos os dados para cadastrar um usuário!
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
@@ -50,57 +50,58 @@ export default function Teacher({ teachers }: Props) {
         }
 
         try {
-            await api.post("/teachers", {
+            await api.post("/users", {
                 name: name,
-                email: email
+                email: email,
+                password: password
             })
 
             toaster.push(
                 <Notification type="success" header="Sucesso!">
-                    Professor cadastrado com sucesso!
+                    Usuário cadastrado com sucesso!
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
             setName("")
             setEmail("")
+            setPassword("")
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toaster.push(
                     <Notification type="error" header="Erro!">
-                        {error.response?.data.message}
+                        {error?.response?.data.message[0]}
                     </Notification>, { placement: "bottomEnd", duration: 3500 }
                 )
+
+                console.log("Erro ao cadastrar usuário :::>> ", error)
             }
         }
 
         try {
-            const response = await api.get("/teachers")
-            setTableData(response.data)
+            const response = await api.get("/users")
+            setUserList(response.data)
         } catch (error) {
             toaster.push(
                 <Notification type="error" header="Erro!">
-                    Erro ao buscar professores!
+                    Erro ao buscar usuários
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
-            console.log("Erro ao buscar professores :::>> ", error)
+            console.log("Erro ao buscar usuários :::>> ", error)
         }
-
     }
 
     return (
         <>
             <Head>
-                <title>Cadastro - Professor</title>
+                <title>Cadastro - Usuários</title>
             </Head>
-
-            <Header title="Cadastro de Professor" />
-
+            <Header title="Cadastro de Usuários" />
             <div className={styles.container}>
                 <div className={styles.containerForm}>
-                    <form className={styles.form} onSubmit={handleRegisterTeacher}>
+                    <form className={styles.form} onSubmit={handleRegisterUser}>
                         <div className={styles.formFields}>
-                            <div style={{ gridColumn: 'span 6' }}>
+                            <div style={{ gridColumn: 'span 4' }}>
                                 <Label>Nome</Label>
                                 <Input
                                     type="text"
@@ -109,13 +110,28 @@ export default function Teacher({ teachers }: Props) {
                                 />
                             </div>
 
-                            <div style={{ gridColumn: 'span 6' }}>
+                            <div style={{ gridColumn: 'span 5' }}>
                                 <Label>Email</Label>
                                 <Input
                                     type="email"
                                     value={email}
                                     onChange={e => setEmail(e)}
                                 />
+                            </div>
+
+                            <div style={{ gridColumn: 'span 3' }}>
+                                <Label>Senha</Label>
+                                <InputGroup inside>
+                                    <Input
+                                        type={visible ? 'text' : 'password'}
+                                        placeholder="Digite sua senha..."
+                                        value={password}
+                                        onChange={(value) => setPassword(value)}
+                                    />
+                                    <InputGroup.Button onClick={handleChange}>
+                                        {visible ? <EyeIcon /> : <EyeSlashIcon />}
+                                    </InputGroup.Button>
+                                </InputGroup>
                             </div>
                         </div>
 
@@ -127,15 +143,14 @@ export default function Teacher({ teachers }: Props) {
                             </ButtonToolbar>
                         </div>
                     </form>
-
                 </div>
 
-                <Divider>Listagem de Professores</Divider>
+                <Divider>Listagem de Usuários</Divider>
 
                 <div className={styles.containerTable}>
                     <Table
-                        height={400}
-                        data={tableData}
+                        autoHeight
+                        data={userList}
                         className={styles.table}
                     >
 
@@ -157,35 +172,26 @@ export default function Teacher({ teachers }: Props) {
                                         <EditIcon
                                             className={styles.buttonEditIcon}
                                             onClick={() => {
-                                                alert("Você está editando o professor: " + rowData.name)
+                                                alert("Você está editando o usuário: " + rowData.name)
                                             }}
                                         />
                                     </>
                                 )}
                             </Cell>
                         </Column>
-
                     </Table>
                 </div>
             </div>
-
-            {modalVisible && (
-                <DeleteConfirmationTeacher
-                    open={handleModalVisible}
-                    visible={modalVisible}
-                />
-            )}
         </>
     )
 }
 
 export const getServerSideProps = canSSRAuth(async () => {
-    const teachers = await api.get("/teachers")
+    const users = await api.get("/users")
 
     return {
         props: {
-            teachers: teachers.data
+            users: users ? users.data : []
         }
     }
-
-}) 
+})

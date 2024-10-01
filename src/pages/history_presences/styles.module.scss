@@ -15,3 +15,14 @@
     row-gap: 1rem;
     word-wrap: break-word;
 }
+
+.containerButton {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+.dateInput {
+    width: 100%;
+}
