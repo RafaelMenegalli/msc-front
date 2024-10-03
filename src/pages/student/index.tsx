@@ -1,6 +1,6 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
-import { DeleteConfirmationStudent } from "@/components/DeleteConfirmationStudent";
+import { DeleteConfirmationStudent } from "@/components/old/DeleteConfirmationStudent";
 import { FormEvent, useEffect, useState } from "react";
 import Head from "next/head";
 import { formatCPF } from "../../utils/formatCPF";
@@ -28,14 +28,29 @@ interface Props {
 }
 
 export default function Student({ students }: Props) {
-    console.log({ students })
     const [modalVisible, setModalVisible] = useState<boolean>(false)
-
     const [name, setName] = useState<string>("")
     const [cpf, setCpf] = useState<string>("")
     const [email, setEmail] = useState<string>("")
     const [tableData, setTableData] = useState<student[]>(students ? students : [])
-    // const [password, setPassword] = useState<string>("")
+    const [filterInput, setFilterInput] = useState<string>("")
+
+    useEffect(() => {
+        if (filterInput === "") {
+            setTableData(students);
+        } else {
+            const filteredData = students.filter(student => {
+                const lowerCaseFilter = filterInput.toLowerCase();
+                return (
+                    student.name.toLowerCase().includes(lowerCaseFilter) ||
+                    student.email.toLowerCase().includes(lowerCaseFilter) ||
+                    student.cpf.includes(lowerCaseFilter) ||
+                    student.rm.includes(lowerCaseFilter)
+                );
+            });
+            setTableData(filteredData);
+        }
+    }, [filterInput, students]);
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
@@ -153,9 +168,18 @@ export default function Student({ students }: Props) {
 
                 <Divider>Listagem de Alunos</Divider>
 
+                <div className={styles.filterContainer}>
+                    <Input
+                        type="text"
+                        value={filterInput}
+                        onChange={(e) => setFilterInput(e)}
+                        placeholder="Pesquise por qualquer coisa..."
+                    />
+                </div>
+
                 <div className={styles.containerTable}>
                     <Table
-                        autoHeight
+                        height={350}
                         data={tableData}
                         className={styles.table}
                     >

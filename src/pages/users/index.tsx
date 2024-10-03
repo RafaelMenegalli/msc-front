@@ -1,6 +1,6 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import Head from "next/head";
 import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder, InputGroup } from 'rsuite';
@@ -31,6 +31,22 @@ export default function Users({ users }: UsersProps) {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [userList, setUserList] = useState<User[]>(users)
+    const [filterInput, setFilterInput] = useState<string>("")
+
+    useEffect(() => {
+        if (filterInput === "") {
+            setUserList(users);
+        } else {
+            const filteredData = users.filter(user => {
+                const lowerCaseFilter = filterInput.toLowerCase();
+                return (
+                    user.name.toLowerCase().includes(lowerCaseFilter) ||
+                    user.email.toLowerCase().includes(lowerCaseFilter)
+                );
+            });
+            setUserList(filteredData);
+        }
+    }, [filterInput, users]);
 
     const handleChange = () => {
         setVisible(!visible);
@@ -147,9 +163,18 @@ export default function Users({ users }: UsersProps) {
 
                 <Divider>Listagem de Usuários</Divider>
 
+                <div className={styles.filterContainer}>
+                    <Input
+                        type="text"
+                        value={filterInput}
+                        onChange={(e) => setFilterInput(e)}
+                        placeholder="Pesquise por qualquer coisa..."
+                    />
+                </div>
+
                 <div className={styles.containerTable}>
                     <Table
-                        autoHeight
+                        height={350}
                         data={userList}
                         className={styles.table}
                     >

@@ -1,14 +1,14 @@
 import styles from "./styles.module.scss";
 import { Header } from "@/components/Header";
-import { DeleteConfirmationTeacher } from "@/components/DeleteConfirmationTeacher";
-import { FormEvent, useState } from "react";
-import { GetServerSideProps } from "next";
+import { DeleteConfirmationTeacher } from "@/components/old/DeleteConfirmationTeacher";
+import { FormEvent, useState, useEffect } from "react";
 import Head from "next/head";
 import axios from "axios";
 import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import { canSSRAuth } from "@/utils/canSSRAuth";
+import { UpdateTeacherModal } from "@/components/UpdateTeacherModal";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -22,21 +22,61 @@ export type teacher = {
 }
 
 interface Props {
-    teachers: teacher[]
+    teachersProps: teacher[]
 }
 
-export default function Teacher({ teachers }: Props) {
+export default function Teacher({ teachersProps }: Props) {
+    const [teachers, setTeachers] = useState<teacher[]>(teachersProps || []);
     const [modalVisible, setModalVisible] = useState<boolean>(false)
-
     const [name, setName] = useState<string>("")
     const [email, setEmail] = useState<string>("")
     const [tableData, setTableData] = useState<teacher[]>(teachers ? teachers : [])
+    const [filterInput, setFilterInput] = useState<string>("")
+    const [teacherToUpdate, setTeacherToUpdate] = useState<teacher | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (filterInput === "") {
+            setTableData(teachers);
+        } else {
+            const filteredData = teachers.filter(teacher => {
+                const lowerCaseFilter = filterInput.toLowerCase();
+                return (
+                    teacher.name.toLowerCase().includes(lowerCaseFilter) ||
+                    teacher.email.toLowerCase().includes(lowerCaseFilter)
+                );
+            });
+            setTableData(filteredData);
+        }
+    }, [filterInput, teachers]);
 
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
     }
 
+    async function refreshData() {
+        setLoading(true);
+        try {
+            const response = await api.get("/teachers");
+            setTableData(response.data);
+            setTeachers(response.data);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.log("Erro ao buscar professores :::>> ", error);
+
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao buscar professores!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            );
+        }
+    }
+
+
     async function handleRegisterTeacher(event: FormEvent) {
+        setLoading(true)
+
         event?.preventDefault();
 
         if (!name || !email) {
@@ -46,6 +86,7 @@ export default function Teacher({ teachers }: Props) {
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
+            setLoading(false)
             return
         }
 
@@ -75,8 +116,11 @@ export default function Teacher({ teachers }: Props) {
 
         try {
             const response = await api.get("/teachers")
+            setTeachers(response.data);
             setTableData(response.data)
+            setLoading(false)
         } catch (error) {
+            setLoading(false)
             toaster.push(
                 <Notification type="error" header="Erro!">
                     Erro ao buscar professores!
@@ -132,11 +176,21 @@ export default function Teacher({ teachers }: Props) {
 
                 <Divider>Listagem de Professores</Divider>
 
+                <div className={styles.filterContainer}>
+                    <Input
+                        type="text"
+                        value={filterInput}
+                        onChange={(e) => setFilterInput(e)}
+                        placeholder="Pesquise por qualquer coisa..."
+                    />
+                </div>
+
                 <div className={styles.containerTable}>
                     <Table
-                        height={400}
+                        height={350}
                         data={tableData}
                         className={styles.table}
+                        loading={loading}
                     >
 
                         <Column flexGrow={1}>
@@ -157,7 +211,8 @@ export default function Teacher({ teachers }: Props) {
                                         <EditIcon
                                             className={styles.buttonEditIcon}
                                             onClick={() => {
-                                                alert("Você está editando o professor: " + rowData.name)
+                                                handleModalVisible()
+                                                setTeacherToUpdate({ id: rowData.id, name: rowData.name, email: rowData.email })
                                             }}
                                         />
                                     </>
@@ -169,10 +224,11 @@ export default function Teacher({ teachers }: Props) {
                 </div>
             </div>
 
-            {modalVisible && (
-                <DeleteConfirmationTeacher
-                    open={handleModalVisible}
-                    visible={modalVisible}
+            {modalVisible && teacherToUpdate && (
+                <UpdateTeacherModal
+                    teacher={teacherToUpdate}
+                    setModalVisible={handleModalVisible}
+                    refreshData={refreshData}
                 />
             )}
         </>
@@ -184,7 +240,7 @@ export const getServerSideProps = canSSRAuth(async () => {
 
     return {
         props: {
-            teachers: teachers.data
+            teachersProps: teachers.data
         }
     }
 
