@@ -2,7 +2,7 @@ import styles from "./styles.module.scss";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import Head from "next/head";
-import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification } from "rsuite";
+import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker } from "rsuite";
 import TagFilterIcon from '@rsuite/icons/TagFilter';
 import CloseIcon from '@rsuite/icons/Close';
 import { student } from "../student";
@@ -10,11 +10,25 @@ import { teacher } from "../teacher";
 import { api } from "@/services/apiClient";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import dayjs from "dayjs";
+import { DateRange } from "rsuite/esm/DateRangePicker/types";
+import ptBR from 'rsuite/locales/pt_BR'
 
 const { Column, HeaderCell, Cell } = Table;
 
 const Label = (props: any) => {
     return <label style={{ width: '100%', display: 'inline-block' }} {...props} />;
+};
+
+const customLocale = {
+    placeholder: 'Selecione o intervalo de datas',
+    today: 'Hoje',
+    yesterday: 'Ontem',
+    last7Days: 'Últimos 7 dias',
+    ok: 'Confirmar',
+    clear: 'Limpar',
+    startDate: 'Data de Início',
+    endDate: 'Data de Fim',
+    dateLocale: ptBR.DateRangePicker.dateLocale // Mantendo o `dateLocale` existente do arquivo de localização
 };
 
 type Presence = {
@@ -42,8 +56,6 @@ interface HistoryPresencesProps {
 
 
 export default function HistoryPresences({ students, teachers, presences }: HistoryPresencesProps) {
-    console.log({ presences })
-
     const [sortColumn, setSortColumn] = useState<string | undefined>();
     const [sortType, setSortType] = useState<'asc' | 'desc' | undefined>();
     const [loading, setLoading] = useState(false);
@@ -51,9 +63,14 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
     const [teacherList, setTeacherList] = useState<{ label: string, value: number }[]>([])
     const [selectedStudent, setSelectedStudent] = useState<number | null>(null)
     const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null)
-    const [initialDate, setInitialDate] = useState<Date | null>(null)
-    const [finalDate, setFinalDate] = useState<Date | null>(null)
+    // const [initialDate, setInitialDate] = useState<Date | null>(null)
+    // const [finalDate, setFinalDate] = useState<Date | null>(null)
     const [presenceList, setPresenceList] = useState<Presence[]>(presences)
+    const [initialFinalDate, setInitialFinalDate] = useState<DateRange | null>(null)
+
+    useEffect(() => {
+        console.log({ initialFinalDate })
+    }, [initialFinalDate])
 
     useEffect(() => {
         const formatStudent = students.map((item) => {
@@ -71,7 +88,7 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
     const handleSortColumn = (sortColumn: string, sortType: 'asc' | 'desc' | undefined) => {
         setLoading(true);
 
-        // Definindo um valor padrão para sortType caso seja undefined
+        // Definindo um valor padrão para sortType caso seja undefinedl
         const finalSortType = sortType || 'asc';
 
         const sortedData = [...presenceList].sort((a, b) => {
@@ -97,8 +114,9 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
         setLoading(true)
         setSelectedStudent(null)
         setSelectedTeacher(null)
-        setInitialDate(null)
-        setFinalDate(null)
+        // setInitialDate(null)
+        // setFinalDate(null)
+        setInitialFinalDate(null)
 
         try {
             const response = await api.get("/presence")
@@ -115,38 +133,44 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
     }
 
     async function handleFilterData() {
-        setLoading(true)
+        setLoading(true);
 
         try {
-            const convertInitalDate = new Date(initialDate ? initialDate : "")
-            const convertFinalDate = new Date(finalDate ? finalDate : "")
+            let formattedInitialDate = null;
+            let formattedFinalDate = null;
 
-            const formattedInitialDate = dayjs(convertInitalDate).format("YYYY-MM-DD") !== 'Invalid Date' ? dayjs(convertInitalDate).format("YYYY-MM-DD") : null;
-            const formattedFinalDate = dayjs(convertFinalDate).format("YYYY-MM-DD") !== 'Invalid Date' ? dayjs(convertFinalDate).format("YYYY-MM-DD") : null;
+            // Apenas formata a data se o intervalo de data foi selecionado
+            if (initialFinalDate && initialFinalDate.length === 2) {
+                const convertInitialDate = new Date(initialFinalDate[0]);
+                const convertFinalDate = new Date(initialFinalDate[1]);
 
-            console.log({ formattedInitialDate })
-            console.log({ formattedFinalDate })
+                formattedInitialDate = dayjs(convertInitialDate).isValid() ? dayjs(convertInitialDate).format("YYYY-MM-DD") : null;
+                formattedFinalDate = dayjs(convertFinalDate).isValid() ? dayjs(convertFinalDate).format("YYYY-MM-DD") : null;
+            }
 
+            // Envia os parâmetros condicionais para o filtro
             const response = await api.get('/presence', {
                 params: {
-                    studentId: selectedStudent,
-                    teacherId: selectedTeacher,
-                    startDate: formattedInitialDate,
-                    endDate: formattedFinalDate
+                    studentId: selectedStudent || undefined,
+                    teacherId: selectedTeacher || undefined,
+                    startDate: formattedInitialDate || undefined,
+                    endDate: formattedFinalDate || undefined,
                 }
             });
 
-            setPresenceList(response.data)
-            setLoading(false)
+            setPresenceList(response.data);
+            setLoading(false);
         } catch (error) {
-            setLoading(false)
+            setLoading(false);
             toaster.push(
                 <Notification type="error" header="Erro!">
                     Erro ao filtrar aulas!
                 </Notification>, { placement: 'bottomEnd', duration: 3500 }
-            )
+            );
         }
     }
+
+
 
     return (
         <>
@@ -180,7 +204,20 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                         />
                     </div>
 
-                    <div style={{ gridColumn: 'span 2' }}>
+                    <div style={{ gridColumn: 'span 3' }}>
+                        <Label>Data Início - Fim</Label>
+                        <DateRangePicker
+                            format="dd/MM/yyyy"
+                            character=" – "
+                            value={initialFinalDate}
+                            onChange={(e) => setInitialFinalDate(e)}
+                            className={styles.dateRangePicker}
+                            placeholder="Selecione uma data..."
+                            locale={customLocale}
+                        />
+                    </div>
+
+                    {/* <div style={{ gridColumn: 'span 2' }}>
                         <Label>Data de Início</Label>
                         <DatePicker
                             format="dd/MM/yyyy"
@@ -189,9 +226,9 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                             onChange={(value) => setInitialDate(value)}
                             className={styles.dateInput}
                         />
-                    </div>
+                    </div> */}
 
-                    <div style={{ gridColumn: 'span 2' }}>
+                    {/* <div style={{ gridColumn: 'span 2' }}>
                         <Label>Data de Fim</Label>
                         <DatePicker
                             format="dd/MM/yyyy"
@@ -200,7 +237,7 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                             onChange={(value) => setFinalDate(value)}
                             className={styles.dateInput}
                         />
-                    </div>
+                    </div> */}
                 </div>
                 <div className={styles.containerButton}>
                     <ButtonToolbar>
@@ -215,7 +252,7 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                 <Divider>Aulas</Divider>
                 <div className={styles.tableContainer}>
                     <Table
-                        height={420}
+                        height={350}
                         data={presenceList}
                         sortColumn={sortColumn}
                         sortType={sortType}

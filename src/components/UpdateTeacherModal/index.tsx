@@ -21,7 +21,7 @@ export function UpdateTeacherModal({ teacher, setModalVisible, refreshData }: Up
     async function handleUpdateTeacher() {
         if (!name || !email) {
             toaster.push(
-                <Notification type="error" header="Erro!">
+                <Notification type="warning" header="Aviso!">
                     Preencha todas as informações para atualizar um professor!
                 </Notification>, { placement: 'bottomEnd', duration: 3500 }
             )

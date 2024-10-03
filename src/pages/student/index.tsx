@@ -9,6 +9,7 @@ import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import axios from "axios";
 import { canSSRAuth } from "@/utils/canSSRAuth";
+import { UpdateStudentModal } from "@/components/UpdateStudentModal";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -24,16 +25,19 @@ export type student = {
 }
 
 interface Props {
-    students: student[]
+    studentsProps: student[]
 }
 
-export default function Student({ students }: Props) {
+export default function Student({ studentsProps }: Props) {
+    const [students, setStudents] = useState<student[]>(studentsProps || [])
     const [modalVisible, setModalVisible] = useState<boolean>(false)
     const [name, setName] = useState<string>("")
     const [cpf, setCpf] = useState<string>("")
     const [email, setEmail] = useState<string>("")
     const [tableData, setTableData] = useState<student[]>(students ? students : [])
     const [filterInput, setFilterInput] = useState<string>("")
+    const [studentToUpdate, setStudentToUpdate] = useState<student>()
+    const [loading, setLoading] = useState<boolean>(false)
 
     useEffect(() => {
         if (filterInput === "") {
@@ -52,12 +56,32 @@ export default function Student({ students }: Props) {
         }
     }, [filterInput, students]);
 
+    async function refreshData() {
+        setLoading(true);
+        try {
+            const response = await api.get("/students");
+            setTableData(response.data);
+            setStudents(response.data);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            console.log("Erro ao buscar professores :::>> ", error);
+
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao buscar professores!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            );
+        }
+    }
+
     const handleModalVisible = () => {
         setModalVisible(!modalVisible)
     }
 
     async function handleRegisterStudent(event: FormEvent) {
         event?.preventDefault();
+        setLoading(true)
 
         if (!name || !email || !cpf) {
             toaster.push(
@@ -66,6 +90,7 @@ export default function Student({ students }: Props) {
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
 
+            setLoading(false)
             return
         }
 
@@ -102,12 +127,16 @@ export default function Student({ students }: Props) {
         try {
             const response = await api.get("/students")
             setTableData(response.data)
+            setLoading(false)
+
         } catch (error) {
             toaster.push(
                 <Notification type="error" header="Erro!">
                     Erro ao buscar alunos!
                 </Notification>, { placement: "bottomEnd", duration: 3500 }
             )
+
+            setLoading(false)
 
             console.log("Erro ao buscar Aluno :::>> ", error)
         }
@@ -182,6 +211,7 @@ export default function Student({ students }: Props) {
                         height={350}
                         data={tableData}
                         className={styles.table}
+                        loading={loading}
                     >
 
                         <Column flexGrow={1}>
@@ -212,7 +242,8 @@ export default function Student({ students }: Props) {
                                         <EditIcon
                                             className={styles.buttonEditIcon}
                                             onClick={() => {
-                                                alert("Você está editando o aluno: " + rowData.name)
+                                                handleModalVisible()
+                                                setStudentToUpdate({ id: rowData.id, name: rowData.name, cpf: rowData.cpf, email: rowData.email, rm: rowData.rm })
                                             }}
                                         />
                                     </>
@@ -223,10 +254,11 @@ export default function Student({ students }: Props) {
                 </div>
             </div>
 
-            {modalVisible && (
-                <DeleteConfirmationStudent
-                    open={handleModalVisible}
-                    visible={modalVisible}
+            {modalVisible && studentToUpdate && (
+                <UpdateStudentModal
+                    setModalVisible={handleModalVisible}
+                    studentToUpdate={studentToUpdate}
+                    refreshData={refreshData}
                 />
             )}
         </>
@@ -238,7 +270,7 @@ export const getServerSideProps = canSSRAuth(async () => {
 
     return {
         props: {
-            students: students.data
+            studentsProps: students.data
         }
     }
 })  
