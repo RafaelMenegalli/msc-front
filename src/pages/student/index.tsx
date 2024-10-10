@@ -126,6 +126,7 @@ export default function Student({ studentsProps }: Props) {
 
         try {
             const response = await api.get("/students")
+            setStudents(response.data)
             setTableData(response.data)
             setLoading(false)
 

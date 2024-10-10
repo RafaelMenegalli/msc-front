@@ -117,7 +117,10 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers 
                                 </div>
                             </div>
                         </div> */}
-                        <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={() => registerPresence(studentCode, selectedTeacher, amountClass)}>Lançar</Button>
+                        <Button color="cyan" className={styles.sendButton} appearance="primary" size="sm" onClick={() => {
+                            registerPresence(studentCode, selectedTeacher, amountClass)
+                        }
+                        }>Lançar</Button>
                     </div>
                 </Modal.Body>
             </Modal >

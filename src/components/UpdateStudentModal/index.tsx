@@ -67,7 +67,7 @@ export function UpdateStudentModal({ setModalVisible, studentToUpdate, refreshDa
             size="lg"
         >
             <Modal.Header>
-                <Modal.Title>Editando aluno: <strong>{studentToUpdate.rm} - {studentToUpdate.name}</strong></Modal.Title>
+                <Modal.Title style={{paddingBottom: '1rem'}}>Editando aluno: <strong>{studentToUpdate.rm} - {studentToUpdate.name}</strong></Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className={styles.formContainer}>

@@ -61,7 +61,7 @@ export function UpdateTeacherModal({ teacher, setModalVisible, refreshData }: Up
             size="lg"
         >
             <Modal.Header>
-                <Modal.Title>Editando professor: <strong>{teacher.name}</strong></Modal.Title>
+                <Modal.Title style={{ paddingBottom: '1rem' }}>Editando professor: <strong>{teacher.name}</strong></Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className={styles.formContainer}>
