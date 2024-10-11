@@ -20,7 +20,8 @@ const CustomInputGroupWidthButton = ({ placeholder, value, onChange, ...props }:
             placeholder={placeholder}
             type="text"
             value={value}
-            onChange={(value) => onChange(value)} // Removi a limitação de input numérico
+            onChange={(value) => onChange(value)}
+            autoComplete="off"
         />
         <InputGroup.Button>
             <SearchIcon />
@@ -168,14 +169,15 @@ export default function Presences({ teachers, students }: PresencesProps) {
                 </div>
             </div>
 
-            {modalVisible && (
-                <LaunchPresenceModal
-                    open={handleModalVisible}
-                    visible={modalVisible}
-                    registerPresence={handleRegisterPresence}
-                    teachers={teachers}
-                />
-            )}
+
+            <LaunchPresenceModal
+                open={handleModalVisible}
+                visible={modalVisible}
+                registerPresence={handleRegisterPresence}
+                teachers={teachers}
+                students={students}
+            />
+
         </>
     );
 }

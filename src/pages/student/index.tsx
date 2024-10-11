@@ -255,8 +255,9 @@ export default function Student({ studentsProps }: Props) {
                 </div>
             </div>
 
-            {modalVisible && studentToUpdate && (
+            {studentToUpdate && (
                 <UpdateStudentModal
+                    visible={modalVisible}
                     setModalVisible={handleModalVisible}
                     studentToUpdate={studentToUpdate}
                     refreshData={refreshData}

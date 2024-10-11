@@ -14,9 +14,10 @@ interface UpdateStudentModalProps {
     setModalVisible: () => void;
     studentToUpdate: student;
     refreshData: () => void;
+    visible: boolean;
 }
 
-export function UpdateStudentModal({ setModalVisible, studentToUpdate, refreshData }: UpdateStudentModalProps) {
+export function UpdateStudentModal({ setModalVisible, studentToUpdate, refreshData, visible }: UpdateStudentModalProps) {
     const [name, setName] = useState<string>(studentToUpdate.name)
     const [email, setEmail] = useState<string>(studentToUpdate.email)
     const [CPF, setCPF] = useState<string>(studentToUpdate.cpf)
@@ -62,12 +63,12 @@ export function UpdateStudentModal({ setModalVisible, studentToUpdate, refreshDa
 
     return (
         <Modal
-            open
+            open={visible}
             onClose={setModalVisible}
             size="lg"
         >
             <Modal.Header>
-                <Modal.Title style={{paddingBottom: '1rem'}}>Editando aluno: <strong>{studentToUpdate.rm} - {studentToUpdate.name}</strong></Modal.Title>
+                <Modal.Title style={{ paddingBottom: '1rem' }}>Editando aluno: <strong>{studentToUpdate.rm} - {studentToUpdate.name}</strong></Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className={styles.formContainer}>
