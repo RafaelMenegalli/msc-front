@@ -1,7 +1,7 @@
 import styles from "./styles.module.scss";
 import { Modal, Input, Button, DatePicker, SelectPicker, toaster, Notification } from "rsuite";
 import { teacher } from "@/pages/teacher";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/services/apiClient";
 
 const Label = (props: any) => {
@@ -12,11 +12,19 @@ interface UpdateTeacherModalProps {
     teacher: teacher;
     setModalVisible: () => void;
     refreshData: () => void;
+    visible: boolean;
 }
 
-export function UpdateTeacherModal({ teacher, setModalVisible, refreshData }: UpdateTeacherModalProps) {
+export function UpdateTeacherModal({ teacher, setModalVisible, refreshData, visible }: UpdateTeacherModalProps) {
     const [name, setName] = useState<string>(teacher.name)
     const [email, setEmail] = useState<string>(teacher.email)
+
+    useEffect(() => {
+        if (teacher) {
+            setName(teacher.name);
+            setEmail(teacher.email);
+        }
+    }, [teacher]);
 
     async function handleUpdateTeacher() {
         if (!name || !email) {
@@ -56,7 +64,7 @@ export function UpdateTeacherModal({ teacher, setModalVisible, refreshData }: Up
 
     return (
         <Modal
-            open
+            open={visible}
             onClose={setModalVisible}
             size="lg"
         >

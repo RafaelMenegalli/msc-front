@@ -9,6 +9,7 @@ import EyeSlashIcon from '@rsuite/icons/legacy/EyeSlash';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import axios from "axios";
+import { setupAPIClient } from "@/services/api";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -189,7 +190,7 @@ export default function Users({ users }: UsersProps) {
                             <Cell dataKey="email" />
                         </Column>
 
-                        <Column width={75} fixed="right">
+                        {/* <Column width={75} fixed="right">
                             <HeaderCell>Ações</HeaderCell>
                             <Cell>
                                 {rowData => (
@@ -203,7 +204,7 @@ export default function Users({ users }: UsersProps) {
                                     </>
                                 )}
                             </Cell>
-                        </Column>
+                        </Column> */}
                     </Table>
                 </div>
             </div>
@@ -211,8 +212,10 @@ export default function Users({ users }: UsersProps) {
     )
 }
 
-export const getServerSideProps = canSSRAuth(async () => {
-    const users = await api.get("/users")
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+    const apiClient = setupAPIClient(ctx)
+
+    const users = await apiClient.get("/users")
 
     return {
         props: {

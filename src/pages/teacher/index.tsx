@@ -4,11 +4,12 @@ import { DeleteConfirmationTeacher } from "@/components/old/DeleteConfirmationTe
 import { FormEvent, useState, useEffect } from "react";
 import Head from "next/head";
 import axios from "axios";
-import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider } from 'rsuite';
+import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Text } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { UpdateTeacherModal } from "@/components/UpdateTeacherModal";
+import { setupAPIClient } from "@/services/api";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -191,6 +192,7 @@ export default function Teacher({ teachersProps }: Props) {
                         data={tableData}
                         className={styles.table}
                         loading={loading}
+                        renderEmpty={() => <Text className={styles.emptyText}>Sem professores cadastrados...</Text>}
                     >
 
                         <Column flexGrow={1}>
@@ -211,8 +213,8 @@ export default function Teacher({ teachersProps }: Props) {
                                         <EditIcon
                                             className={styles.buttonEditIcon}
                                             onClick={() => {
-                                                handleModalVisible()
                                                 setTeacherToUpdate({ id: rowData.id, name: rowData.name, email: rowData.email })
+                                                handleModalVisible()
                                             }}
                                         />
                                     </>
@@ -224,8 +226,9 @@ export default function Teacher({ teachersProps }: Props) {
                 </div>
             </div>
 
-            {modalVisible && teacherToUpdate && (
+            {teacherToUpdate && (
                 <UpdateTeacherModal
+                    visible={modalVisible}
                     teacher={teacherToUpdate}
                     setModalVisible={handleModalVisible}
                     refreshData={refreshData}
@@ -235,8 +238,10 @@ export default function Teacher({ teachersProps }: Props) {
     )
 }
 
-export const getServerSideProps = canSSRAuth(async () => {
-    const teachers = await api.get("/teachers")
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+    const apiClient = setupAPIClient(ctx)
+
+    const teachers = await apiClient.get("/teachers")
 
     return {
         props: {

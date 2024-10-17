@@ -106,6 +106,12 @@ export function LaunchPresenceModal({ open, visible, registerPresence, teachers,
                                 placeholder="Selecione um professor..."
                                 value={selectedTeacher}
                                 onChange={(value) => setSelectedTeacher(value)}
+                                renderMenu={(menu) => {
+                                    if (teacherList.length === 0) {
+                                        return <Text style={{ padding: 10, textAlign: 'center' }}>Nenhum professor disponível</Text>;
+                                    }
+                                    return menu;
+                                }}
                             />
                         </div>
 

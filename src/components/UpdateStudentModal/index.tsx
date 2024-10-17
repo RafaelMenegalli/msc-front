@@ -1,7 +1,7 @@
 import styles from "./styles.module.scss";
 import { Modal, Input, Button, DatePicker, SelectPicker, toaster, Notification } from "rsuite";
 import { teacher } from "@/pages/teacher";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/services/apiClient";
 import { student } from "@/pages/student";
 import { formatCPF } from "@/utils/formatCPF";
@@ -21,6 +21,14 @@ export function UpdateStudentModal({ setModalVisible, studentToUpdate, refreshDa
     const [name, setName] = useState<string>(studentToUpdate.name)
     const [email, setEmail] = useState<string>(studentToUpdate.email)
     const [CPF, setCPF] = useState<string>(studentToUpdate.cpf)
+
+    useEffect(() => {
+        if (studentToUpdate) {
+            setName(studentToUpdate.name)
+            setEmail(studentToUpdate.email)
+            setCPF(studentToUpdate.cpf)
+        }
+    }, [studentToUpdate])
 
     async function handleUpdateStudent() {
         if (!name || !email || !CPF) {

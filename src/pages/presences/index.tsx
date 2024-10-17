@@ -13,6 +13,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 import dayjs from "dayjs";
 import SearchIcon from '@rsuite/icons/Search';
 import { student } from "../student";
+import { setupAPIClient } from "@/services/api";
 
 const CustomInputGroupWidthButton = ({ placeholder, value, onChange, ...props }: any) => (
     <InputGroup {...props} inside style={{ width: '400px' }}>
@@ -182,9 +183,11 @@ export default function Presences({ teachers, students }: PresencesProps) {
     );
 }
 
-export const getServerSideProps = canSSRAuth(async () => {
-    const teachers = await api.get("/teachers");
-    const students = await api.get("/students");
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+    const apiClient = setupAPIClient(ctx)
+
+    const teachers = await apiClient.get("/teachers");
+    const students = await apiClient.get("/students");
 
     return {
         props: {

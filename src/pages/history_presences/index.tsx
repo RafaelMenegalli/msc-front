@@ -2,7 +2,7 @@ import styles from "./styles.module.scss";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import Head from "next/head";
-import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker } from "rsuite";
+import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker, Text } from "rsuite";
 import TagFilterIcon from '@rsuite/icons/TagFilter';
 import CloseIcon from '@rsuite/icons/Close';
 import { student } from "../student";
@@ -12,6 +12,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 import dayjs from "dayjs";
 import { DateRange } from "rsuite/esm/DateRangePicker/types";
 import ptBR from 'rsuite/locales/pt_BR'
+import { setupAPIClient } from "@/services/api";
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -190,6 +191,12 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                             placeholder="Selecione um aluno..."
                             value={selectedStudent}
                             onChange={(value) => setSelectedStudent(value)}
+                            renderMenu={(menu) => {
+                                if (studentList.length === 0) {
+                                    return <Text style={{ padding: 10, textAlign: 'center' }}>Nenhum aluno disponível</Text>;
+                                }
+                                return menu;
+                            }}
                         />
                     </div>
 
@@ -201,6 +208,12 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                             placeholder="Selecione um professor..."
                             value={selectedTeacher}
                             onChange={(value) => setSelectedTeacher(value)}
+                            renderMenu={(menu) => {
+                                if (teacherList.length === 0) {
+                                    return <Text style={{ padding: 10, textAlign: 'center' }}>Nenhum professor disponível</Text>;
+                                }
+                                return menu;
+                            }}
                         />
                     </div>
 
@@ -258,6 +271,7 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                         sortType={sortType}
                         onSortColumn={handleSortColumn}
                         loading={loading}
+                        renderEmpty={() => <Text className={styles.emptyText}>Sem presenças lançadas...</Text>}
                     >
 
                         {/* Coluna para exibir o nome do aluno */}
@@ -307,11 +321,13 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
     );
 }
 
-export const getServerSideProps = canSSRAuth(async () => {
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+    const apiClient = setupAPIClient(ctx)
+
     try {
-        const students = await api.get("/students");
-        const teachers = await api.get("/teachers");
-        const presences = await api.get("/presence");
+        const students = await apiClient.get("/students");
+        const teachers = await apiClient.get("/teachers");
+        const presences = await apiClient.get("/presence");
 
         return {
             props: {

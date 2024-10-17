@@ -4,12 +4,13 @@ import { DeleteConfirmationStudent } from "@/components/old/DeleteConfirmationSt
 import { FormEvent, useEffect, useState } from "react";
 import Head from "next/head";
 import { formatCPF } from "../../utils/formatCPF";
-import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder } from 'rsuite';
+import { ButtonToolbar, Button, Input, Notification, toaster, Table, Divider, Placeholder, Text } from 'rsuite';
 import EditIcon from '@rsuite/icons/Edit';
 import { api } from "@/services/apiClient";
 import axios from "axios";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import { UpdateStudentModal } from "@/components/UpdateStudentModal";
+import { setupAPIClient } from "@/services/api";
 
 const { Column, HeaderCell, Cell } = Table;
 const Label = (props: any) => {
@@ -213,6 +214,7 @@ export default function Student({ studentsProps }: Props) {
                         data={tableData}
                         className={styles.table}
                         loading={loading}
+                        renderEmpty={() => <Text className={styles.emptyText}>Sem alunos cadastrados...</Text>}
                     >
 
                         <Column flexGrow={1}>
@@ -267,8 +269,10 @@ export default function Student({ studentsProps }: Props) {
     )
 }
 
-export const getServerSideProps = canSSRAuth(async () => {
-    const students = await api.get("/students")
+export const getServerSideProps = canSSRAuth(async (ctx) => {
+    const apiClient = setupAPIClient(ctx)
+
+    const students = await apiClient.get("/students")
 
     return {
         props: {
