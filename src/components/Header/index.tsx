@@ -58,7 +58,7 @@ export function Header({ title }: HeaderProps) {
             <Nav>
                 <Nav.Menu title="Configurações">
                     <Nav.Item icon={<CogIcon />} as={Link} href="/settings">Configurações Gerais</Nav.Item>
-                    {/* <Nav.Item icon={<UserBadgeIcon />} as={Link} href="/users">Usuários</Nav.Item> */}
+                    <Nav.Item icon={<UserBadgeIcon />} as={Link} href="/users">Usuários</Nav.Item>
                     <Nav.Item icon={<ExitIcon />} as={Button} onClick={signOut} className={styles.exitButton}>Sair</Nav.Item>
                 </Nav.Menu>
             </Nav>
