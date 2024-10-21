@@ -22,11 +22,11 @@ type User = {
 }
 
 interface UsersProps {
-    users: User[]
+    usersProps: User[]
 }
 
-export default function Users({ users }: UsersProps) {
-    console.log({ users })
+export default function Users({ usersProps }: UsersProps) {
+    const [users, setUsers] = useState<User[]>(usersProps ? usersProps : [])
     const [visible, setVisible] = useState(false);
     const [name, setName] = useState<string>("")
     const [email, setEmail] = useState<string>("")
@@ -97,6 +97,7 @@ export default function Users({ users }: UsersProps) {
         try {
             const response = await api.get("/users")
             setUserList(response.data)
+            setUsers(response.data)
         } catch (error) {
             toaster.push(
                 <Notification type="error" header="Erro!">
@@ -219,7 +220,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
 
     return {
         props: {
-            users: users ? users.data : []
+            usersProps: users ? users.data : []
         }
     }
 })
