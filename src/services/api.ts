@@ -11,7 +11,7 @@ export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const URLHomolog = "https://devoted-ambition-production.up.railway.app"
 
     const api = axios.create({
-        baseURL: URLHomolog,
+        baseURL: URLProd,
         headers: {
             authorization: `Bearer ${token}`
         }
