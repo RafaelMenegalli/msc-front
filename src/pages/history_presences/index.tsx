@@ -2,7 +2,7 @@ import styles from "./styles.module.scss";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import Head from "next/head";
-import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker, Text } from "rsuite";
+import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker, Text, Carousel } from "rsuite";
 import TagFilterIcon from '@rsuite/icons/TagFilter';
 import CloseIcon from '@rsuite/icons/Close';
 import { student } from "../student";
@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { DateRange } from "rsuite/esm/DateRangePicker/types";
 import ptBR from 'rsuite/locales/pt_BR'
 import { setupAPIClient } from "@/services/api";
+import TrashIcon from '@rsuite/icons/Trash';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -171,6 +172,14 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
         }
     }
 
+    async function handleDeletePresence(id: number) {
+        try {
+            await api.delete("/presence/" + id)
+        } catch(error) {
+            
+        }
+    }
+
 
 
     return (
@@ -311,6 +320,22 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                             <HeaderCell>Fim Aula</HeaderCell>
                             <Cell dataKey="endsAt">
                                 {(rowData: Presence) => dayjs(rowData.endsAt).add(3, 'hour').format("DD/MM/YYYY HH:mm:ss")}
+                            </Cell>
+                        </Column>
+
+                        <Column width={75} fixed="right">
+                            <HeaderCell>Ações</HeaderCell>
+                            <Cell>
+                                {rowData => (
+                                    <>
+                                        <TrashIcon
+                                            className={styles.trashIcon}
+                                            onClick={() => {
+                                                alert(rowData.id)
+                                            }}
+                                        />
+                                    </>
+                                )}
                             </Cell>
                         </Column>
 
