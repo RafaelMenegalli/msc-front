@@ -70,8 +70,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 password: password
             })
 
-            console.log({ response })
-
             const { access_token: token } = response.data
 
             setCookie(undefined, '@mscauth.token', token, {

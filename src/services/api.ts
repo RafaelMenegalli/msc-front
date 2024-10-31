@@ -2,6 +2,7 @@ import { GetServerSidePropsContext } from "next";
 import axios, { AxiosError } from "axios";
 import { parseCookies, destroyCookie } from "nookies";
 import { signOut } from "@/contexts/AuthContext";
+import { AuthTokenError } from "./errors/AuthTokenError";
 
 export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const cookies = parseCookies(ctx);
@@ -22,14 +23,14 @@ export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     }, (error: AxiosError) => {
         if (error.response?.status === 401) {
             if (typeof window !== "undefined") {
-                // Caso o código esteja rodando no client-side
-                signOut(); // Desloga o usuário
+                signOut(); // Client-side: deslogar o usuário
             } else if (ctx) {
-                // Caso o código esteja rodando no server-side (SSR)
-                destroyCookie(ctx, '@mscauth.token'); // Limpa o cookie com o token inválido
-                ctx.res.writeHead(302, { Location: "/" }); // Redireciona para a página de login
+                destroyCookie(ctx, '@mscauth.token', { path: '/' });
+                ctx.res.writeHead(302, { Location: "/" });
                 ctx.res.end();
+                return Promise.reject(new AuthTokenError());
             }
+
         }
 
         return Promise.reject(error);
