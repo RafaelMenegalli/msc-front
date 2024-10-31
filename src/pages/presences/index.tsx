@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { LaunchPresenceModal } from "@/components/LaunchPresenceModal";
-import { Button, Notification, toaster, List, Text, Input, InputGroup } from 'rsuite';
+import { Button, Notification, toaster, List, Text, Input, InputGroup, Whisper, Popover } from 'rsuite';
 import ArrowDownLineIcon from '@rsuite/icons/ArrowDownLine';
 import ArrowUpLineIcon from '@rsuite/icons/ArrowUpLine';
 import { api } from "@/services/apiClient";
@@ -12,6 +12,7 @@ import axios from "axios";
 import { canSSRAuth } from "@/utils/canSSRAuth";
 import dayjs from "dayjs";
 import SearchIcon from '@rsuite/icons/Search';
+import ReloadIcon from '@rsuite/icons/Reload';
 import { student } from "../student";
 import { setupAPIClient } from "@/services/api";
 
@@ -30,9 +31,15 @@ const CustomInputGroupWidthButton = ({ placeholder, value, onChange, ...props }:
     </InputGroup>
 );
 
+const speaker = (
+    <Popover>
+        <p>Se o seu nome não aparecer na lista, clique no botão abaixo para atualizar a lista de alunos.</p>
+    </Popover>
+);
+
 interface PresencesProps {
     teachers: teacher[];
-    students: student[];
+    studentsProps: student[];
 }
 
 type lastStudentClass = {
@@ -40,12 +47,14 @@ type lastStudentClass = {
     date: string;
 }
 
-export default function Presences({ teachers, students }: PresencesProps) {
+export default function Presences({ teachers, studentsProps }: PresencesProps) {
+    const [students, setStudents] = useState<student[]>(studentsProps ? studentsProps : [])
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [showHeader, setShowHeader] = useState<boolean>(false);
     const [lastStudent, setLastStudent] = useState<lastStudentClass>();
     const [studentRM, setStudentRM] = useState<string>(''); // Aqui aceita nome ou RM
     const [studentList, setStudentList] = useState<student[]>(students ? students : []);
+    const [loadingRefreshButton, setLoadingRefreshButton] = useState<boolean>(false)
     const [confirmPresenceModal, setConfirmPresenceModal] = useState<Boolean>(false)
 
     useEffect(() => {
@@ -119,8 +128,25 @@ export default function Presences({ teachers, students }: PresencesProps) {
         }
     }
 
-    async function handleSearchRM() {
-        alert(studentRM);
+    async function handleRefreshStudents() {
+        setLoadingRefreshButton(true)
+
+        try {
+            const students = await api.get("/students")
+
+            setStudentList(students.data)
+            setStudents(students.data)
+            setLoadingRefreshButton(false)
+        } catch (error) {
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao buscar alunos!
+                </Notification>, { placement: "bottomEnd", duration: 3500 }
+            );
+
+            setLoadingRefreshButton(false)
+            console.log({ error })
+        }
     }
 
     return (
@@ -156,12 +182,17 @@ export default function Presences({ teachers, students }: PresencesProps) {
                 )}
 
                 <div className={styles.searchInputContainer}>
-                    <CustomInputGroupWidthButton
-                        size="md"
-                        placeholder="Encontrar aluno..."
-                        value={studentRM}
-                        onChange={(value: string) => setStudentRM(value)}
-                    />
+                    <div className={styles.buttonToolBar}>
+                        <CustomInputGroupWidthButton
+                            size="md"
+                            placeholder="Encontrar aluno..."
+                            value={studentRM}
+                            onChange={(value: string) => setStudentRM(value)}
+                        />
+                        <Whisper placement="top" trigger="hover" controlId="control-id-hover-enterable" speaker={speaker} enterable>
+                            <Button startIcon={<ReloadIcon className={styles.reloadIcon} />} appearance="primary" color="violet" onClick={handleRefreshStudents} loading={loadingRefreshButton}></Button>
+                        </Whisper>
+                    </div>
                     <List bordered style={{ width: '50%', height: '200px' }}>
                         {studentList.map((item: student) => (
                             <List.Item key={item.id}>{item.rm} - {item.name}</List.Item>
@@ -192,7 +223,7 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
     return {
         props: {
             teachers: teachers ? teachers.data : [],
-            students: students ? students.data : []
+            studentsProps: students ? students.data : []
         }
     };
 });

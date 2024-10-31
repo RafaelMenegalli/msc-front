@@ -2,7 +2,7 @@ import styles from "./styles.module.scss";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import Head from "next/head";
-import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker, Text, Carousel } from "rsuite";
+import { Button, DatePicker, SelectPicker, Divider, Table, ButtonToolbar, toaster, Notification, DateRangePicker, Text, Carousel, Modal } from "rsuite";
 import TagFilterIcon from '@rsuite/icons/TagFilter';
 import CloseIcon from '@rsuite/icons/Close';
 import { student } from "../student";
@@ -14,6 +14,7 @@ import { DateRange } from "rsuite/esm/DateRangePicker/types";
 import ptBR from 'rsuite/locales/pt_BR'
 import { setupAPIClient } from "@/services/api";
 import TrashIcon from '@rsuite/icons/Trash';
+import RemindIcon from '@rsuite/icons/legacy/Remind';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -69,6 +70,8 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
     // const [finalDate, setFinalDate] = useState<Date | null>(null)
     const [presenceList, setPresenceList] = useState<Presence[]>(presences)
     const [initialFinalDate, setInitialFinalDate] = useState<DateRange | null>(null)
+    const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false)
+    const [idToDelete, setIdToDelete] = useState<number | null>(null)
 
     useEffect(() => {
         console.log({ initialFinalDate })
@@ -141,7 +144,6 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
             let formattedInitialDate = null;
             let formattedFinalDate = null;
 
-            // Apenas formata a data se o intervalo de data foi selecionado
             if (initialFinalDate && initialFinalDate.length === 2) {
                 const convertInitialDate = new Date(initialFinalDate[0]);
                 const convertFinalDate = new Date(initialFinalDate[1]);
@@ -172,15 +174,62 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
         }
     }
 
-    async function handleDeletePresence(id: number) {
+    async function handleDeletePresence(id: number | null) {
+        if (!id) {
+            setDeleteModalOpen(false)
+            return;
+        }
+
+        setLoading(true)
+
         try {
             await api.delete("/presence/" + id)
-        } catch(error) {
-            
+
+            let formattedInitialDate = null;
+            let formattedFinalDate = null;
+
+            if (initialFinalDate && initialFinalDate.length === 2) {
+                const convertInitialDate = new Date(initialFinalDate[0]);
+                const convertFinalDate = new Date(initialFinalDate[1]);
+
+                formattedInitialDate = dayjs(convertInitialDate).isValid() ? dayjs(convertInitialDate).format("YYYY-MM-DD") : null;
+                formattedFinalDate = dayjs(convertFinalDate).isValid() ? dayjs(convertFinalDate).format("YYYY-MM-DD") : null;
+            }
+
+            const response = await api.get('/presence', {
+                params: {
+                    studentId: selectedStudent || undefined,
+                    teacherId: selectedTeacher || undefined,
+                    startDate: formattedInitialDate || undefined,
+                    endDate: formattedFinalDate || undefined,
+                }
+            });
+
+            setPresenceList(response.data);
+            setLoading(false);
+            setDeleteModalOpen(false)
+
+            toaster.push(
+                <Notification type="success" header="Sucesso!">
+                    Presença excluida com sucesso!
+                </Notification>, { placement: 'bottomEnd', duration: 3500 }
+            );
+        } catch (error) {
+            toaster.push(
+                <Notification type="error" header="Erro!">
+                    Erro ao excluir presença!
+                </Notification>, { placement: 'bottomEnd', duration: 3500 }
+            );
+
+            setLoading(false);
+            setDeleteModalOpen(false)
+            console.log({ error })
         }
     }
 
-
+    function handleChangeConfirmDeleteModal() {
+        setDeleteModalOpen(!deleteModalOpen)
+    }
 
     return (
         <>
@@ -331,7 +380,8 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                                         <TrashIcon
                                             className={styles.trashIcon}
                                             onClick={() => {
-                                                alert(rowData.id)
+                                                setIdToDelete(rowData.id)
+                                                handleChangeConfirmDeleteModal()
                                             }}
                                         />
                                     </>
@@ -342,6 +392,23 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
                     </Table>
                 </div>
             </div>
+
+            <Modal backdrop="static" role="alertdialog" open={deleteModalOpen} onClose={handleChangeConfirmDeleteModal} size="xs">
+                <Modal.Body>
+                    <div className={styles.confirmDeleteModalHeader}>
+                        <RemindIcon style={{ color: '#ffb300', fontSize: 24 }} />
+                        Tem certeza que deseja deletar essa presença?
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => handleDeletePresence(idToDelete)} appearance="primary" color="red">
+                        Deletar
+                    </Button>
+                    <Button onClick={handleChangeConfirmDeleteModal} appearance="subtle">
+                        Cancel
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }
