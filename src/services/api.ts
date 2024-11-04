@@ -4,7 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import { signOut } from "@/contexts/AuthContext";
 import { AuthTokenError } from "./errors/AuthTokenError";
 
-export function setupAPIClient(ctx = undefined) {
+export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const cookies = parseCookies(ctx);
     const token = cookies['@mscauth.token'];
 
@@ -12,7 +12,7 @@ export function setupAPIClient(ctx = undefined) {
     const URLHomolog = "https://devoted-ambition-production.up.railway.app";
 
     const api = axios.create({
-        baseURL: URLProd,
+        baseURL: URLHomolog,
         headers: {
             authorization: `Bearer ${token}`
         }
