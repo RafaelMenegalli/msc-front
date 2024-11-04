@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { parseCookies, destroyCookie } from 'nookies';
+import { parseCookies } from 'nookies';
 import { AuthTokenError } from './../services/errors/AuthTokenError';
 
 export function canSSRAuth<P extends { [key: string]: any }>(fn: GetServerSideProps<P>) {
@@ -22,11 +22,15 @@ export function canSSRAuth<P extends { [key: string]: any }>(fn: GetServerSidePr
       return await fn(ctx);
     } catch (err) {
       if (err instanceof AuthTokenError) {
-        console.log("Erro de autenticação. Redirecionando e destruindo o cookie...");
-        destroyCookie(ctx, '@mscauth.token');
-        ctx.res.writeHead(302, { Location: '/' });
-        ctx.res.end();
-        return { props: {} as P }; // Evita erro de tipo
+        // Deleta o cookie de forma nativa usando setHeader
+        ctx.res.setHeader('Set-Cookie', '@mscauth.token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT');
+
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false,
+          },
+        };
       }
 
       throw err; // Lança outros erros que não sejam AuthTokenError

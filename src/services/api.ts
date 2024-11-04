@@ -4,7 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import { signOut } from "@/contexts/AuthContext";
 import { AuthTokenError } from "./errors/AuthTokenError";
 
-export function setupAPIClient(ctx?: GetServerSidePropsContext) {
+export function setupAPIClient(ctx = undefined) {
     const cookies = parseCookies(ctx);
     const token = cookies['@mscauth.token'];
 
@@ -25,9 +25,6 @@ export function setupAPIClient(ctx?: GetServerSidePropsContext) {
             if (typeof window !== "undefined") {
                 signOut(); // Client-side: deslogar o usuário
             } else if (ctx) {
-                destroyCookie(ctx, '@mscauth.token', { path: '/' });
-                ctx.res.writeHead(302, { Location: "/" });
-                ctx.res.end();
                 return Promise.reject(new AuthTokenError());
             }
 
