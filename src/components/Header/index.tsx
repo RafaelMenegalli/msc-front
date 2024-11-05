@@ -50,6 +50,15 @@ export function Header({ title }: HeaderProps) {
                             Professor
                         </Nav.Item>
                     </Nav.Menu>
+                    <Nav.Menu title="Financeiro">
+                        <Nav.Item as={Link} href="/account_payable">
+                            Contas a Pagar
+                        </Nav.Item>
+
+                        <Nav.Item as={Link} href="/account_receivable">
+                            Contas a Receber
+                        </Nav.Item>
+                    </Nav.Menu>
                 </Nav>
             </Nav>
 

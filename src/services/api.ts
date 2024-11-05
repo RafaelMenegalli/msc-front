@@ -4,7 +4,7 @@ import { parseCookies, destroyCookie } from "nookies";
 import { signOut } from "@/contexts/AuthContext";
 import { AuthTokenError } from "./errors/AuthTokenError";
 
-export function setupAPIClient(ctx = undefined) {
+export function setupAPIClient(ctx?: GetServerSidePropsContext) {
     const cookies = parseCookies(ctx);
     const token = cookies['@mscauth.token'];
 
