@@ -31,7 +31,7 @@ const customLocale = {
     clear: 'Limpar',
     startDate: 'Data de Início',
     endDate: 'Data de Fim',
-    dateLocale: ptBR.DateRangePicker.dateLocale // Mantendo o `dateLocale` existente do arquivo de localização
+    dateLocale: ptBR.DateRangePicker.dateLocale
 };
 
 type Presence = {
