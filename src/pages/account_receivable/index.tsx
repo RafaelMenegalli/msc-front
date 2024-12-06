@@ -5,7 +5,7 @@ import { canSSRAuth } from "@/utils/canSSRAuth";
 export default function AccountReceivable() {
     return (
         <>
-            <Header title="Contas a Receber" />
+            {/* <Header title="Contas a Receber" /> */}
 
         </>
     )

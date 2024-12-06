@@ -1,0 +1,56 @@
+.container {
+    width: 100%;
+    height: 45px;
+    background-color: #34c3ff;
+}
+
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 1rem;
+}
+
+.leftSide {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.leftIcons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.breadcrumb {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+.rightSite {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconButton {
+    cursor: pointer;
+    color: white;
+
+    &:hover {
+        transform: scale(1.2);
+    }
+}
+
+.pageNameText {
+    color: white;
+}

@@ -114,7 +114,7 @@ export default function Users({ usersProps }: UsersProps) {
             <Head>
                 <title>Cadastro - Usuários</title>
             </Head>
-            <Header title="Cadastro de Usuários" />
+            {/* <Header title="Cadastro de Usuários" /> */}
             <div className={styles.container}>
                 <div className={styles.containerForm}>
                     <form className={styles.form} onSubmit={handleRegisterUser}>

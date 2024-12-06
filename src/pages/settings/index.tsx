@@ -63,7 +63,7 @@ export default function Settings({ settings }: SettingsProps) {
             <Head>
                 <title>Configurações</title>
             </Head>
-            <Header title="Configurações" />
+            {/* <Header title="Configurações" /> */}
             <div className={styles.container}>
                 <div className={styles.formContainer}>
                     <div style={{ gridColumn: 'span 2' }}>

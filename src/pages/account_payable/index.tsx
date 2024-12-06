@@ -91,7 +91,7 @@ export default function AccountPayable() {
             <Head>
                 <title>Contas a Pagar</title>
             </Head>
-            <Header title="Contas a Pagar" />
+            {/* <Header title="Contas a Pagar" /> */}
 
             <div className={styles.container}>
                 <div className={styles.buttonToolBar}>

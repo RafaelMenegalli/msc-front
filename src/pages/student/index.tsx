@@ -150,7 +150,7 @@ export default function Student({ studentsProps }: Props) {
             <Head>
                 <title>Cadastro - Aluno</title>
             </Head>
-            <Header title="Cadastro de Aluno" />
+            {/* <Header title="Cadastro de Aluno" /> */}
             <div className={styles.container}>
                 <div className={styles.containerForm}>
                     <form className={styles.form} onSubmit={handleRegisterStudent}>

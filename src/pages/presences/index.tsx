@@ -157,7 +157,7 @@ export default function Presences({ teachers, studentsProps }: PresencesProps) {
 
             {showHeader ? (
                 <>
-                    <Header title="Lançamento de Presença" />
+                    {/* <Header title="Lançamento de Presença" /> */}
                     <div className={styles.containerMenuIcon}>
                         <ArrowUpLineIcon className={styles.arrowIcon} onClick={() => setShowHeader(!showHeader)} />
                     </div>

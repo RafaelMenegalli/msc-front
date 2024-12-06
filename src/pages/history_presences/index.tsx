@@ -236,7 +236,7 @@ export default function HistoryPresences({ students, teachers, presences }: Hist
             <Head>
                 <title>Histórico de Presença - MSCFront</title>
             </Head>
-            <Header title="Histórico de Presença" />
+            {/* <Header title="Histórico de Presença" /> */}
 
             <div className={styles.container}>
                 <Divider>Filtros</Divider>

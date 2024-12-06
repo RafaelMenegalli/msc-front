@@ -139,7 +139,7 @@ export default function Teacher({ teachersProps }: Props) {
                 <title>Cadastro - Professor</title>
             </Head>
 
-            <Header title="Cadastro de Professor" />
+            {/* <Header title="Cadastro de Professor" /> */}
 
             <div className={styles.container}>
                 <div className={styles.containerForm}>
